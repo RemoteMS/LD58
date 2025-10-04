@@ -167,6 +167,8 @@ MonoBehaviour:
     TypeName: _Project.Src.Core.DI.Scopes.ProjectScope
   autoRun: 1
   autoInjectGameObjects: []
+  tileSetting:
+    hexPrefab: {fileID: 2132193973458317273, guid: 5c22a6c53c4d14bf8abc8993724f7604, type: 3}
 --- !u!1 &617664342
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,47 @@
+using System;
+using System.Collections.Generic;
+using _Project.Src.Common.Hex;
+using _Project.Src.Core.DI.Classes;
+using UniRx;
+
+namespace _Project.Src.Common.GexGrid
+{
+    public class HexMap : BaseService
+    {
+        public struct AddedCell
+        {
+            public Hex hex;
+            public CellModel model;
+        }
+
+        private readonly Dictionary<Hex, CellModel> _cells;
+
+        public IObservable<AddedCell> onCellAdded => _onCellAdded;
+        private readonly Subject<AddedCell> _onCellAdded = new();
+
+
+        public HexMap()
+        {
+            _cells = new();
+
+            var startHex = new Hex(0, 0, 0);
+            _cells[startHex] = new CellModel();
+        }
+
+
+        public bool HasTile(Hex hex) => _cells.ContainsKey(hex);
+
+        public void SetTile(Hex hex, CellModel cell)
+        {
+            _cells[hex] = cell;
+
+            _onCellAdded.OnNext(new AddedCell { hex = hex, model = cell });
+        }
+
+        public CellModel GetTile(Hex hex) => _cells.GetValueOrDefault(hex);
+
+        public IEnumerable<Hex> GetAllCoords() => _cells.Keys;
+    }
+
+
+}
