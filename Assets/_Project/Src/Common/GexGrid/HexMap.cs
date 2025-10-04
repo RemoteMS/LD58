@@ -17,9 +17,13 @@ namespace _Project.Src.Common.GexGrid
         }
 
         private readonly Dictionary<Hex, CellModel> _cells;
+        private readonly HashSet<Hex> _availableNeighborsConnectedToCenter = new();
 
         public IObservable<AddedCell> onCellAdded => _onCellAdded;
         private readonly Subject<AddedCell> _onCellAdded = new();
+
+        public IObservable<Hex> onCellRemoved => _onCellRemoved;
+        private readonly Subject<Hex> _onCellRemoved = new();
 
         private Layout _layout;
 
@@ -39,8 +43,8 @@ namespace _Project.Src.Common.GexGrid
         public void SetTile(Hex hex, CellModel cell)
         {
             _cells[hex] = cell;
-
             UpdateConnectedToCenterFlags();
+            UpdateAvailableNeighbors();
             _onCellAdded.OnNext(new AddedCell { hex = hex, model = cell });
         }
 
@@ -50,14 +54,25 @@ namespace _Project.Src.Common.GexGrid
             {
                 cellModel.Dispose();
                 _cells.Remove(hex);
-
                 UpdateConnectedToCenterFlags();
+                UpdateAvailableNeighbors();
+                _onCellRemoved.OnNext(hex);
             }
         }
 
         public CellModel GetTile(Hex hex) => _cells.GetValueOrDefault(hex);
 
         public IEnumerable<Hex> GetAllCoords() => _cells.Keys;
+
+        public bool IsHexOnAvailable(Hex hex)
+        {
+            return _availableNeighborsConnectedToCenter.Contains(hex);
+        }
+
+        public IReadOnlyCollection<Hex> GetAllAvailableNeighborsConnectedToCenter()
+        {
+            return _availableNeighborsConnectedToCenter;
+        }
 
         public Hex WorldToHex(Vector3 worldPos)
         {
@@ -82,6 +97,7 @@ namespace _Project.Src.Common.GexGrid
             var center = new Hex(0, 0, 0);
             if (!_cells.ContainsKey(center))
             {
+                Debug.LogWarning("No central tile found at (0, 0, 0)");
                 return;
             }
 
@@ -98,7 +114,6 @@ namespace _Project.Src.Common.GexGrid
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-
                 for (var i = 0; i < 6; i++)
                 {
                     var neighbor = current.Neighbor(i);
@@ -109,6 +124,27 @@ namespace _Project.Src.Common.GexGrid
                         if (_cells.TryGetValue(neighbor, out var neighborCell))
                         {
                             neighborCell.SetConnectedToCenter(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void UpdateAvailableNeighbors()
+        {
+            _availableNeighborsConnectedToCenter.Clear();
+            var existingHexes = _cells.Keys;
+
+            foreach (var hex in existingHexes)
+            {
+                if (_cells.TryGetValue(hex, out var cell) && cell.isConnectedToCenter.Value)
+                {
+                    for (var i = 0; i < 6; i++)
+                    {
+                        var neighbor = hex.Neighbor(i);
+                        if (!_cells.ContainsKey(neighbor))
+                        {
+                            _availableNeighborsConnectedToCenter.Add(neighbor);
                         }
                     }
                 }

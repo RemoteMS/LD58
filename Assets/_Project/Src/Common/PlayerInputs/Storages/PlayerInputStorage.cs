@@ -7,6 +7,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 {
     public class PlayerInputStorage : BaseService
     {
+        public IReadOnlyReactiveProperty<bool> isHexOnAvailable => _isHexOnAvailable;
+        private readonly ReactiveProperty<bool> _isHexOnAvailable;
+
         public IReadOnlyReactiveProperty<CellModel> currentCellModel => _currentCellModel;
         private readonly ReactiveProperty<CellModel> _currentCellModel;
 
@@ -32,6 +35,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 
             _currentCellModel = new ReactiveProperty<CellModel>(null);
             _currentCellModel.AddTo(this);
+
+            _isHexOnAvailable = new ReactiveProperty<bool>(false);
+            _isHexOnAvailable.AddTo(this);
         }
 
         public void RotateHexCounterclockwise()
@@ -57,6 +63,11 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public void SetCurrentCellModel(CellModel value)
         {
             _currentCellModel.Value = value;
+        }
+
+        public void SetHexOnAvailable(bool value)
+        {
+            _isHexOnAvailable.Value = value;
         }
     }
 }

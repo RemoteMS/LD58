@@ -107,6 +107,7 @@ namespace _Project.Src.Common.PlayerInputs
 
         private void HandleHexPlacing()
         {
+            // пкм
             if (Input.GetMouseButtonDown(1))
             {
                 if (TryGetWorldPoint(out var worldPoint))
@@ -114,6 +115,12 @@ namespace _Project.Src.Common.PlayerInputs
                     Debug.LogWarning($"worldPoint - {worldPoint}");
                     worldPoint.y = 0;
                     var hex = _controller.WorldToHex(worldPoint);
+
+                    if (!_storage.isHexOnAvailable.Value)
+                    {
+                        return;
+                    }
+
                     var hexCenter = _controller.HexToWorld(hex);
                     _controller.SetTile(
                         hex,
@@ -137,6 +144,9 @@ namespace _Project.Src.Common.PlayerInputs
 
                 var hexCenter = _controller.HexToWorld(hex);
                 _storage.SetCurrentHexPosition(hexCenter);
+
+                var isHexOnAvailable = _controller.IsHexOnAvailable(hex);
+                _storage.SetHexOnAvailable(isHexOnAvailable);
             }
         }
 

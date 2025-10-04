@@ -24,6 +24,7 @@ namespace _Project.Src.Common.PlayerInputs.Views
 
 
         private readonly PointerBinder _pointerBinder;
+        private readonly Vector3 _hiddenPosition = new Vector3(0, 1000, 0);
 
         public PlayerView(PlayerInputStorage storage, HexSetting setting, CellSettings cellSettings)
         {
@@ -37,13 +38,11 @@ namespace _Project.Src.Common.PlayerInputs.Views
             _rotation = _pointer.transform.rotation;
 
             storage.currentCellModel.Subscribe(x => OnCellModelChange(x)).AddTo(this);
-            storage.currentHex.Subscribe().AddTo(this);
+            storage.currentHexRotation.Subscribe(RotateOnIndex).AddTo(this);
 
             storage.currentHexPosition
-                .Subscribe(SetPosition)
-                .AddTo(this);
-            storage.currentHexRotation
-                .Subscribe(RotateOnIndex)
+                .CombineLatest(storage.isHexOnAvailable, (pos, isAvailable) => (pos, isAvailable))
+                .Subscribe(x => SetPosition(x.isAvailable ? x.pos : _hiddenPosition))
                 .AddTo(this);
 
 #if UNITY_EDITOR

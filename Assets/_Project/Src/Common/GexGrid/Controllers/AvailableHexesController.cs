@@ -73,7 +73,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         private void UpdateAvailableNeighbors()
         {
-            var newNeighbors = _mapController.GetAllAvailableNeighborsConnectedToCenter();
+            var newNeighbors = _mapController.GetAllAvailableNeighborsConnectedToCenter().ToHashSet();
 
             var toRemove = _neighborViews.Keys.Where(hex => !newNeighbors.Contains(hex)).ToList();
             foreach (var hex in toRemove)
@@ -88,7 +88,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
                     _neighborViews.Remove(hex);
                 }
             }
-
 
             foreach (var hex in newNeighbors)
             {

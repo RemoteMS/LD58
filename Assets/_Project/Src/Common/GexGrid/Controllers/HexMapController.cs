@@ -26,8 +26,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             CellSettings cellSettings,
             PlayerInputStorage playerInputStorage,
             Hand hand,
-            HexMap map
-        )
+            HexMap map)
         {
             _settings = settings;
             _cellSettings = cellSettings;
@@ -96,7 +95,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
             _map.SetTile(hex, cellModel);
 
             var takeHexFromHand = _hand.TakeHexFromHand();
-
             _playerInputStorage.SetCurrentCellModel(takeHexFromHand);
         }
 
@@ -120,6 +118,11 @@ namespace _Project.Src.Common.GexGrid.Controllers
         {
             var cell = _map.GetTile(hex);
             return cell != null && cell.isConnectedToCenter.Value;
+        }
+        
+        public bool IsHexOnAvailable(Hex hex)
+        {
+            return _map.IsHexOnAvailable(hex);
         }
 
         public Hex FindHexAtDistanceFromConnected(int distance)
@@ -243,8 +246,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
-            Debug.Log(
-                $"Available neighbors for hex {hex.qrs}: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
+            Debug.Log($"Available neighbors for hex {hex.qrs}: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors;
         }
 
@@ -265,27 +267,15 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
+            Debug.Log($"All available neighbors: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors.ToList();
         }
 
-        public HashSet<Hex> GetAllAvailableNeighborsConnectedToCenter()
+        public List<Hex> GetAllAvailableNeighborsConnectedToCenter()
         {
-            var availableNeighbors = new HashSet<Hex>();
-            var existingHexes = _map.GetAllCoords();
-
-            foreach (var hex in existingHexes)
-            {
-                if (IsConnectedToCenter(hex))
-                {
-                    var neighbors = GetAvailableNeighbors(hex);
-                    foreach (var neighbor in neighbors)
-                    {
-                        availableNeighbors.Add(neighbor);
-                    }
-                }
-            }
-
-            return availableNeighbors;
+            var availableNeighbors = _map.GetAllAvailableNeighborsConnectedToCenter();
+            Debug.Log($"Available neighbors connected to center: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
+            return availableNeighbors.ToList();
         }
     }
 }
