@@ -35,6 +35,19 @@ namespace _Project.Src.Common.PlayerInputs
 
             GetAndSetCurrentHex();
             HandleHexPlacing();
+
+            HandleAddTower();
+        }
+
+        private void HandleAddTower()
+        {
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                var findHexAtDistanceFromConnected = _controller.FindRandomHexAtDistanceFromConnected(5);
+
+                Debug.LogWarning($"random hex - {findHexAtDistanceFromConnected.qrs}");
+                _controller.SetTile(findHexAtDistanceFromConnected, new CellModel());
+            }
         }
 
         private void HandleCamera()
@@ -52,6 +65,13 @@ namespace _Project.Src.Common.PlayerInputs
             else if (Input.GetKey(KeyCode.E)) rotation = 1f;
 
             _cameraMover.SetRotation(rotation);
+
+            // Zoom/Movement with mouse wheel or X/C
+            var zoomInput = Input.GetAxis("Mouse ScrollWheel");
+            if (Input.GetKey(KeyCode.X)) zoomInput = 1f;
+            else if (Input.GetKey(KeyCode.C)) zoomInput = -1f;
+
+            _cameraMover.SetZoom(zoomInput);
         }
 
         private void HandleHexPlacing()

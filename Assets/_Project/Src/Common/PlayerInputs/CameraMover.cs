@@ -39,5 +39,36 @@ namespace _Project.Src.Common.PlayerInputs
                 _cameraContainer.Rotate(Vector3.up, rotateAmount);
             }
         }
+
+        public void SetZoom(float zoom)
+        {
+            if (zoom != 0f)
+            {
+                var distance = zoom * _settings.zoomSpeed * Time.deltaTime;
+                MoveCameraLocally(distance);
+            }
+        }
+
+        private void MoveCameraLocally(float distance)
+        {
+            var localMove = _settings.cameraTransform.TransformDirection(Vector3.forward) * distance;
+            var newPosition = _settings.cameraTransform.position + localMove;
+            var currentY = _settings.cameraTransform.position.y;
+            var newY = newPosition.y;
+
+            // Only apply movement if it doesn't exceed limits
+            if (newY >= 0.5f && newY <= 100f)
+            {
+                _settings.cameraTransform.position = newPosition;
+            }
+            else
+            {
+                // If moving towards limit, adjust to the boundary
+                if (newY < _settings.zoomMin && distance < 0)
+                    _settings.cameraTransform.position = new Vector3(newPosition.x, _settings.zoomMin, newPosition.z);
+                else if (newY > _settings.zoomMax && distance > 0)
+                    _settings.cameraTransform.position = new Vector3(newPosition.x, _settings.zoomMax, newPosition.z);
+            }
+        }
     }
 }

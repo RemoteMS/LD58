@@ -240,6 +240,9 @@ MonoBehaviour:
     cameraTransform: {fileID: 1118714717}
     moveSpeed: 5
     rotationSpeed: 100
+    zoomSpeed: 30
+    zoomMin: 1
+    zoomMax: 50
 --- !u!1001 &217344642
 PrefabInstance:
   m_ObjectHideFlags: 0

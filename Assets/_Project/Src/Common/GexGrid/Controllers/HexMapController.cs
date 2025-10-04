@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Core.DI.Classes;
 using UniRx;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace _Project.Src.Common.GexGrid.Controllers
 {
@@ -63,7 +65,128 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         public void SetTile(Hex hex, CellModel cellModel)
         {
-            _map.SetTile(hex, cellModel);
+            if (!_map.HasTile(hex))
+                _map.SetTile(hex, cellModel);
+        }
+
+        public void RemoveTile(Hex hex)
+        {
+            _map.RemoveTile(hex);
+        }
+
+        public bool IsConnectedToCenter(Hex hex)
+        {
+            var cell = _map.GetTile(hex);
+            return cell != null && cell.isConnectedToCenter.Value;
+        }
+
+        public Hex FindHexAtDistanceFromConnected(int distance)
+        {
+            if (distance <= 0)
+            {
+                Debug.LogError("Distance must be positive.");
+                throw new System.ArgumentException("Distance must be positive.");
+            }
+
+            var existingHexes = _views.Keys.ToList();
+            if (existingHexes.Count == 0)
+            {
+                throw new System.ArgumentException("Map is empty.");
+            }
+
+            foreach (var hex in existingHexes)
+            {
+                for (var i = 0; i < 6; i++)
+                {
+                    var direction = Hex.Direction(i);
+                    var candidate = hex.Add(direction.Scale(distance));
+
+                    if (_views.ContainsKey(candidate))
+                    {
+                        continue;
+                    }
+
+                    var isValid = true;
+                    foreach (var existingHex in existingHexes)
+                    {
+                        if (candidate.Distance(existingHex) < distance)
+                        {
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    if (isValid)
+                    {
+                        return candidate;
+                    }
+                }
+            }
+
+            throw new System.ArgumentException("Nothing found.");
+        }
+
+        public List<Hex> FindAllHexesAtDistanceFromConnected(int distance)
+        {
+            if (distance <= 0)
+            {
+                Debug.LogError("Distance must be positive.");
+                throw new System.ArgumentException("Distance must be positive.");
+            }
+
+            var existingHexes = _views.Keys.ToList();
+            if (existingHexes.Count == 0)
+            {
+                throw new System.ArgumentException("Map is empty.");
+            }
+
+            var result = new List<Hex>();
+            var checkedCandidates = new HashSet<Hex>(); // Для избежания дубликатов
+
+            foreach (var hex in existingHexes)
+            {
+                for (var i = 0; i < 6; i++)
+                {
+                    var direction = Hex.Direction(i);
+                    var candidate = hex.Add(direction.Scale(distance));
+
+                    if (_views.ContainsKey(candidate) || checkedCandidates.Contains(candidate))
+                    {
+                        continue;
+                    }
+
+                    checkedCandidates.Add(candidate);
+
+
+                    var isValid = true;
+                    foreach (var existingHex in existingHexes)
+                    {
+                        if (candidate.Distance(existingHex) < distance)
+                        {
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    if (isValid)
+                    {
+                        result.Add(candidate);
+                    }
+                }
+            }
+
+            if (result.Count == 0)
+            {
+                throw new System.ArgumentException("No hexes found at the specified distance.");
+            }
+
+            return result;
+        }
+
+        public Hex FindRandomHexAtDistanceFromConnected(int distance)
+        {
+            var hexes = FindAllHexesAtDistanceFromConnected(distance);
+            return hexes[Random.Range(0, hexes.Count)];
         }
     }
 }

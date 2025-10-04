@@ -46,13 +46,13 @@ namespace _Project.Src.Common.PlayerInputs.Views
             storage.currentHex.Subscribe(x =>
             {
                 qrs = $"{x.qrs}";
-                Debug.LogWarning($"new value qrs - {qrs}. [{Time.time}]");
+                // Debug.LogWarning($"new value qrs - {qrs}. [{Time.time}]");
             }).AddTo(this);
 
             storage.currentHexPosition.Subscribe(x =>
             {
                 position = x;
-                Debug.LogWarning($"new value position - {position}. [{Time.time}]");
+                // Debug.LogWarning($"new value position - {position}. [{Time.time}]");
             }).AddTo(this);
         }
     }

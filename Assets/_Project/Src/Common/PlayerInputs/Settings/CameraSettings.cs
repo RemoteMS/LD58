@@ -12,5 +12,9 @@ namespace _Project.Src.Common.PlayerInputs.Settings
         // todo: maybe move something else 
         [Header("Controller setting")] public float moveSpeed = 5f;
         public float rotationSpeed = 100f;
+        public float zoomSpeed = 10f;
+        public float zoomMin = 0.5f;
+        public float zoomMax = 100f;
+
     }
 }

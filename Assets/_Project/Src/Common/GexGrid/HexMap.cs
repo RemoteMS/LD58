@@ -23,15 +23,6 @@ namespace _Project.Src.Common.GexGrid
 
         private Layout _layout;
 
-        // public HexMap()
-        // {
-        //     _cells = new();
-        //
-        //     var startHex = new Hex(0, 0, 0);
-        //     _cells[startHex] = new CellModel();
-        // }
-
-
         public HexMap(HexSetting settings)
         {
             _cells = new();
@@ -50,6 +41,19 @@ namespace _Project.Src.Common.GexGrid
             _cells[hex] = cell;
 
             _onCellAdded.OnNext(new AddedCell { hex = hex, model = cell });
+
+            UpdateConnectedToCenterFlags();
+        }
+
+        public void RemoveTile(Hex hex)
+        {
+            if (_cells.TryGetValue(hex, out var cellModel))
+            {
+                cellModel.Dispose();
+                _cells.Remove(hex);
+
+                UpdateConnectedToCenterFlags();
+            }
         }
 
         public CellModel GetTile(Hex hex) => _cells.GetValueOrDefault(hex);
@@ -67,6 +71,49 @@ namespace _Project.Src.Common.GexGrid
             var x = hex.q                  * 1.5f;
             var z = (hex.r + hex.q * 0.5f) * Mathf.Sqrt(3);
             return new Vector3(x, 0, z);
+        }
+
+        private void UpdateConnectedToCenterFlags()
+        {
+            foreach (var cell in _cells.Values)
+            {
+                cell.SetConnectedToCenter(false);
+            }
+
+            var center = new Hex(0, 0, 0);
+            if (!_cells.ContainsKey(center))
+            {
+                return;
+            }
+
+            var visited = new HashSet<Hex>();
+            var queue = new Queue<Hex>();
+            queue.Enqueue(center);
+            visited.Add(center);
+
+            if (_cells.TryGetValue(center, out var centerCell))
+            {
+                centerCell.SetConnectedToCenter(true);
+            }
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                
+                for (var i = 0; i < 6; i++)
+                {
+                    var neighbor = current.Neighbor(i);
+                    if (_cells.ContainsKey(neighbor) && !visited.Contains(neighbor))
+                    {
+                        queue.Enqueue(neighbor);
+                        visited.Add(neighbor);
+                        if (_cells.TryGetValue(neighbor, out var neighborCell))
+                        {
+                            neighborCell.SetConnectedToCenter(true);
+                        }
+                    }
+                }
+            }
         }
     }
 }
