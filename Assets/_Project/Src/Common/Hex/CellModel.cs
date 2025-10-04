@@ -31,6 +31,18 @@ namespace _Project.Src.Common.Hex
             }
         }
 
+        public CellModel(int rotation)
+        {
+            _sides = new SideData[6];
+
+            for (var i = 0; i < 6; i++)
+            {
+                _sides[i] = new SideData(Color.white);
+            }
+
+            _rotation = new ReactiveProperty<int>(rotation);
+        }
+
         public void SetColor(Color color)
         {
             _color.Value = color;

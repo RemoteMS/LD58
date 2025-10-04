@@ -5,6 +5,8 @@ namespace _Project.Src.Common.HandStack
 {
     public class Hand : BaseService
     {
+        private int _count = 70;
+        
         // todo: change on tile Type
         private List<int> _hand;
         

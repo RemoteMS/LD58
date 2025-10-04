@@ -70,7 +70,8 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         public void SetTile(Hex hex, CellModel cellModel)
         {
-            _map.SetTile(hex, cellModel);
+            if (!_map.HasTile(hex))
+                _map.SetTile(hex, cellModel);
         }
 
         public void RemoveTile(Hex hex)

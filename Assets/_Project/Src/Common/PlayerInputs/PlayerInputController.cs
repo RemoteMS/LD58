@@ -98,7 +98,10 @@ namespace _Project.Src.Common.PlayerInputs
                     worldPoint.y = 0;
                     var hex = _controller.WorldToHex(worldPoint);
                     var hexCenter = _controller.HexToWorld(hex);
-                    _controller.SetTile(hex, new CellModel());
+                    _controller.SetTile(
+                        hex,
+                        new CellModel(rotation: _storage.currentHexRotation.Value)
+                    );
                 }
             }
         }
