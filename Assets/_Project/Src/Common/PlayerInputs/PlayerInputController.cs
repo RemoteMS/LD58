@@ -1,5 +1,6 @@
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.Hex;
+using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Core.DI.Classes;
 using UnityEngine;
 using VContainer.Unity;
@@ -10,10 +11,17 @@ namespace _Project.Src.Common.PlayerInputs
     {
         private readonly Camera _camera;
         private readonly HexMapController _controller;
+        private readonly PlayerInputStorage _storage;
 
-        public PlayerInputController(HexMapController controller)
+        private readonly CameraMover _cameraMover;
+
+        public PlayerInputController(HexMapController controller, PlayerInputStorage storage, CameraMover cameraMover)
         {
             _controller = controller;
+            _storage = storage;
+            _cameraMover = cameraMover;
+
+
             _camera = Camera.main;
         }
 
@@ -22,6 +30,31 @@ namespace _Project.Src.Common.PlayerInputs
         }
 
         void ITickable.Tick()
+        {
+            HandleCamera();
+
+            GetAndSetCurrentHex();
+            HandleHexPlacing();
+        }
+
+        private void HandleCamera()
+        {
+            // Movement
+            var horizontal = Input.GetAxisRaw("Horizontal"); // A/D
+            var vertical = Input.GetAxisRaw("Vertical");     // W/S
+            var moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+
+            _cameraMover.SetMoveDirection(moveDirection);
+
+            // Rotation
+            var rotation = 0f;
+            if (Input.GetKey(KeyCode.Q)) rotation = -1f;
+            else if (Input.GetKey(KeyCode.E)) rotation = 1f;
+
+            _cameraMover.SetRotation(rotation);
+        }
+
+        private void HandleHexPlacing()
         {
             if (Input.GetMouseButtonDown(1))
             {
@@ -33,6 +66,22 @@ namespace _Project.Src.Common.PlayerInputs
                     var hexCenter = _controller.HexToWorld(hex);
                     _controller.SetTile(hex, new CellModel());
                 }
+            }
+        }
+
+        private void GetAndSetCurrentHex()
+        {
+            var ray = _camera.ScreenPointToRay(Input.mousePosition);
+
+            if (new Plane(Vector3.up, Vector3.zero).Raycast(ray, out var distance))
+            {
+                var worldPoint = ray.GetPoint(distance);
+
+                var hex = _controller.WorldToHex(worldPoint);
+                _storage.SetCurrentHex(hex);
+
+                var hexCenter = _controller.HexToWorld(hex);
+                _storage.SetCurrentHexPosition(hexCenter);
             }
         }
 
@@ -58,7 +107,5 @@ namespace _Project.Src.Common.PlayerInputs
 
             return false;
         }
-
-
     }
 }

@@ -1,9 +1,11 @@
-using System;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs;
+using _Project.Src.Common.PlayerInputs.Settings;
+using _Project.Src.Common.PlayerInputs.Storages;
+using _Project.Src.Common.PlayerInputs.Views;
 using _Project.Src.Core.Inputs;
 using UnityEngine;
 using VContainer;
@@ -14,6 +16,7 @@ namespace _Project.Src.Core.DI.Scopes
     public class GameScope : LifetimeScope
     {
         [SerializeField] private HexSetting tileSetting;
+        [SerializeField] private CameraSettings cameraSettings;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -21,6 +24,9 @@ namespace _Project.Src.Core.DI.Scopes
             builder.RegisterEntryPoint<PlayerInputController>().AsSelf();
 
             builder.RegisterComponent<HexSetting>(tileSetting).AsSelf();
+            builder.RegisterComponent<CameraSettings>(cameraSettings).AsSelf();
+
+            builder.Register<CameraMover>(lifetime: Lifetime.Singleton).AsSelf();
 
             // todo: probably should be removed 
             builder.Register<HexMapDrawer>(lifetime: Lifetime.Singleton).AsSelf();
@@ -28,10 +34,14 @@ namespace _Project.Src.Core.DI.Scopes
             builder.Register<HexMapController>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<Hand>(lifetime: Lifetime.Singleton).AsSelf();
 
+            builder.Register<PlayerInputStorage>(lifetime: Lifetime.Singleton).AsSelf();
+            builder.Register<PlayerView>(lifetime: Lifetime.Singleton).AsSelf();
+
             builder.RegisterBuildCallback(c =>
             {
                 c.Resolve<HexMapController>();
                 c.Resolve<HexMapDrawer>();
+                c.Resolve<PlayerView>();
             });
         }
     }

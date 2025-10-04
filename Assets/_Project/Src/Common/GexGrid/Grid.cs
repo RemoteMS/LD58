@@ -102,7 +102,7 @@ namespace _Project.Src.Common.GexGrid
         }
 
 
-        public string Qrs() => $"[{q},{r},{s}]";
+        public string qrs => $"[{q},{r},{s}]";
 
         public bool Equals(Hex other)
         {
