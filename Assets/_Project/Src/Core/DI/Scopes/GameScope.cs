@@ -1,4 +1,5 @@
 using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.GexGrid;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
@@ -31,12 +32,16 @@ namespace _Project.Src.Core.DI.Scopes
             builder.RegisterComponent<CellSettings>(cellSettings).AsSelf();
             builder.RegisterComponent<HandSettings>(handSettings).AsSelf();
 
+            builder.Register<HexMap>(lifetime: Lifetime.Singleton).AsSelf();
+
+
             builder.Register<CameraMover>(lifetime: Lifetime.Singleton).AsSelf();
 
             // todo: probably should be removed 
             builder.Register<HexMapDrawer>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.Register<HexMapController>(lifetime: Lifetime.Singleton).AsSelf();
+            builder.Register<AvailableHexesController>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<Hand>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.Register<PlayerInputStorage>(lifetime: Lifetime.Singleton).AsSelf();
@@ -45,6 +50,7 @@ namespace _Project.Src.Core.DI.Scopes
             builder.RegisterBuildCallback(c =>
             {
                 c.Resolve<HexMapController>();
+                c.Resolve<AvailableHexesController>();
                 c.Resolve<HexMapDrawer>();
                 c.Resolve<PlayerView>();
                 c.Resolve<Hand>();

@@ -1,5 +1,6 @@
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.Hex;
+using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Core.DI.Classes;
 using UnityEngine;
@@ -14,12 +15,15 @@ namespace _Project.Src.Common.PlayerInputs
         private readonly PlayerInputStorage _storage;
 
         private readonly CameraMover _cameraMover;
+        private readonly HexSetting _settings;
 
-        public PlayerInputController(HexMapController controller, PlayerInputStorage storage, CameraMover cameraMover)
+        public PlayerInputController(HexMapController controller, PlayerInputStorage storage, CameraMover cameraMover,
+            HexSetting settings)
         {
             _controller = controller;
             _storage = storage;
             _cameraMover = cameraMover;
+            _settings = settings;
 
 
             _camera = Camera.main;
@@ -61,6 +65,19 @@ namespace _Project.Src.Common.PlayerInputs
 
                 Debug.LogWarning($"random hex - {findHexAtDistanceFromConnected.qrs}");
                 _controller.SetTile(findHexAtDistanceFromConnected, new CellModel());
+            }
+
+            if (Input.GetKeyUp(KeyCode.Z))
+            {
+                var allAvailableNeighbors = _controller.GetAllAvailableNeighbors();
+                foreach (var neighbor in allAvailableNeighbors)
+                {
+                    Object.Instantiate(
+                        _settings.emptyAvailableHexPrefab,
+                        _controller.HexToWorld(neighbor),
+                        Quaternion.identity
+                    );
+                }
             }
         }
 

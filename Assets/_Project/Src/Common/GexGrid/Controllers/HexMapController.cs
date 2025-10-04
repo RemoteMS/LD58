@@ -21,15 +21,20 @@ namespace _Project.Src.Common.GexGrid.Controllers
         private readonly HexMap _map;
         private readonly Dictionary<Hex, HexView> _views = new();
 
-        public HexMapController(HexSetting settings, CellSettings cellSettings, PlayerInputStorage playerInputStorage,
-            Hand hand)
+        public HexMapController(
+            HexSetting settings,
+            CellSettings cellSettings,
+            PlayerInputStorage playerInputStorage,
+            Hand hand,
+            HexMap map
+        )
         {
             _settings = settings;
             _cellSettings = cellSettings;
             _playerInputStorage = playerInputStorage;
             _hand = hand;
 
-            _map = new HexMap(settings);
+            _map = map;
             _map.onCellAdded.Subscribe(OnCellAdded).AddTo(this);
 
             SetTile(new Hex(0, 0, 0), new CellModel());
@@ -91,10 +96,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
             _map.SetTile(hex, cellModel);
 
             var takeHexFromHand = _hand.TakeHexFromHand();
-
-            // Debug.LogWarning($"new tile is [{takeHexFromHand.GetSideTypes()}]");
-            // Debug.LogWarning($"new tile direction is [{takeHexFromHand.rotation.Value}], and global {_playerInputStorage.currentHexRotation.Value}");
-            // takeHexFromHand.SetRotation(_playerInputStorage.currentHexRotation.Value);
 
             _playerInputStorage.SetCurrentCellModel(takeHexFromHand);
         }
@@ -198,7 +199,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
                     checkedCandidates.Add(candidate);
 
-
                     var isValid = true;
                     foreach (var existingHex in existingHexes)
                     {
@@ -228,6 +228,64 @@ namespace _Project.Src.Common.GexGrid.Controllers
         {
             var hexes = FindAllHexesAtDistanceFromConnected(distance);
             return hexes[Random.Range(0, hexes.Count)];
+        }
+
+        public List<Hex> GetAvailableNeighbors(Hex hex)
+        {
+            var availableNeighbors = new List<Hex>();
+
+            for (var i = 0; i < 6; i++)
+            {
+                var neighbor = hex.Neighbor(i);
+                if (!_map.HasTile(neighbor))
+                {
+                    availableNeighbors.Add(neighbor);
+                }
+            }
+
+            Debug.Log(
+                $"Available neighbors for hex {hex.qrs}: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
+            return availableNeighbors;
+        }
+
+        public List<Hex> GetAllAvailableNeighbors()
+        {
+            var availableNeighbors = new HashSet<Hex>();
+            var existingHexes = _map.GetAllCoords();
+
+            foreach (var hex in existingHexes)
+            {
+                for (var i = 0; i < 6; i++)
+                {
+                    var neighbor = hex.Neighbor(i);
+                    if (!availableNeighbors.Contains(neighbor) && !_map.HasTile(neighbor))
+                    {
+                        availableNeighbors.Add(neighbor);
+                    }
+                }
+            }
+
+            return availableNeighbors.ToList();
+        }
+
+        public HashSet<Hex> GetAllAvailableNeighborsConnectedToCenter()
+        {
+            var availableNeighbors = new HashSet<Hex>();
+            var existingHexes = _map.GetAllCoords();
+
+            foreach (var hex in existingHexes)
+            {
+                if (IsConnectedToCenter(hex))
+                {
+                    var neighbors = GetAvailableNeighbors(hex);
+                    foreach (var neighbor in neighbors)
+                    {
+                        availableNeighbors.Add(neighbor);
+                    }
+                }
+            }
+
+            return availableNeighbors;
         }
     }
 }

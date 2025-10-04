@@ -40,9 +40,8 @@ namespace _Project.Src.Common.GexGrid
         {
             _cells[hex] = cell;
 
-            _onCellAdded.OnNext(new AddedCell { hex = hex, model = cell });
-
             UpdateConnectedToCenterFlags();
+            _onCellAdded.OnNext(new AddedCell { hex = hex, model = cell });
         }
 
         public void RemoveTile(Hex hex)
@@ -99,7 +98,7 @@ namespace _Project.Src.Common.GexGrid
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                
+
                 for (var i = 0; i < 6; i++)
                 {
                     var neighbor = current.Neighbor(i);
