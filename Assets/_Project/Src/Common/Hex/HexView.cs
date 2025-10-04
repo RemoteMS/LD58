@@ -20,5 +20,23 @@ namespace _Project.Src.Common.Hex
                 _renderer.material.color = color;
             }
         }
+
+        public void SetMaterials(Material[] newMaterials)
+        {
+            if (!_renderer || newMaterials == null) return;
+
+            _renderer.materials = newMaterials;
+        }
+
+        public void SetMaterialAt(int index, Material material)
+        {
+            if (!_renderer || !material) return;
+
+            var mats = _renderer.materials;
+            if (index < 0 || index >= mats.Length) return;
+
+            mats[index] = material;
+            _renderer.materials = mats;
+        }
     }
 }

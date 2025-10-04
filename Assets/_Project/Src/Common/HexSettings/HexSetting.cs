@@ -11,5 +11,8 @@ namespace _Project.Src.Common.HexSettings
 
         // todo: take it from array or something 
         public GameObject hexPrefab;
+        
+        // todo: move to another settings
+        public float hexRotationSpeed = 0.2f;
     }
 }

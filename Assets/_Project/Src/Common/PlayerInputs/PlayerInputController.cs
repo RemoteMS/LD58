@@ -31,12 +31,26 @@ namespace _Project.Src.Common.PlayerInputs
 
         void ITickable.Tick()
         {
+            HandleRotateCurrentHex();
             HandleCamera();
 
             GetAndSetCurrentHex();
             HandleHexPlacing();
 
             HandleAddTower();
+        }
+
+        private void HandleRotateCurrentHex()
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                _storage.RotateHexClockwise();
+            }
+            // todo: change input key
+            else if (Input.GetKeyDown(KeyCode.T))
+            {
+                _storage.RotateHexCounterclockwise();
+            }
         }
 
         private void HandleAddTower()

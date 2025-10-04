@@ -1,3 +1,4 @@
+using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
@@ -17,6 +18,7 @@ namespace _Project.Src.Core.DI.Scopes
     {
         [SerializeField] private HexSetting tileSetting;
         [SerializeField] private CameraSettings cameraSettings;
+        [SerializeField] private CellSettings cellSettings;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -25,6 +27,7 @@ namespace _Project.Src.Core.DI.Scopes
 
             builder.RegisterComponent<HexSetting>(tileSetting).AsSelf();
             builder.RegisterComponent<CameraSettings>(cameraSettings).AsSelf();
+            builder.RegisterComponent<CellSettings>(cellSettings).AsSelf();
 
             builder.Register<CameraMover>(lifetime: Lifetime.Singleton).AsSelf();
 

@@ -40,6 +40,11 @@ namespace _Project.Src.Common.GexGrid.Controllers
             view.Bind(controller);
 
             view.transform.position = HexToWorld(cell.hex);
+            // Синхронизируем визуальный поворот с CellModel
+            cell.model.rotation.Subscribe(rotation =>
+            {
+                view.transform.rotation = Quaternion.Euler(0, rotation * 60f, 0);
+            }).AddTo(this);
 
             _views[cell.hex] = view;
 
@@ -65,13 +70,23 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         public void SetTile(Hex hex, CellModel cellModel)
         {
-            if (!_map.HasTile(hex))
-                _map.SetTile(hex, cellModel);
+            _map.SetTile(hex, cellModel);
         }
 
         public void RemoveTile(Hex hex)
         {
             _map.RemoveTile(hex);
+        }
+
+        public void RotateTile(Hex hex, int rotation)
+        {
+            var cell = _map.GetTile(hex);
+            if (cell == null)
+            {
+                throw new System.ArgumentException($"No tile exists at hex {hex.qrs}.");
+            }
+
+            cell.SetRotation(rotation);
         }
 
         public bool IsConnectedToCenter(Hex hex)
@@ -141,7 +156,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             }
 
             var result = new List<Hex>();
-            var checkedCandidates = new HashSet<Hex>(); // Для избежания дубликатов
+            var checkedCandidates = new HashSet<Hex>();
 
             foreach (var hex in existingHexes)
             {
