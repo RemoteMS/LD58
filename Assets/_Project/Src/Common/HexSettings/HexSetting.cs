@@ -1,3 +1,4 @@
+using _Project.Src.Common.PlayerInputs.Views;
 using UnityEngine;
 
 namespace _Project.Src.Common.HexSettings
@@ -11,7 +12,8 @@ namespace _Project.Src.Common.HexSettings
 
         // todo: take it from array or something 
         public GameObject hexPrefab;
-        
+        public GameObject pointerPrefab;
+
         // todo: move to another settings
         public float hexRotationSpeed = 0.2f;
     }

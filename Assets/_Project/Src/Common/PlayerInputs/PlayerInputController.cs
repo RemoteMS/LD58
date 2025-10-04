@@ -100,7 +100,8 @@ namespace _Project.Src.Common.PlayerInputs
                     var hexCenter = _controller.HexToWorld(hex);
                     _controller.SetTile(
                         hex,
-                        new CellModel(rotation: _storage.currentHexRotation.Value)
+                        _storage.currentCellModel.Value
+                        // new CellModel(rotation: _storage.currentHexRotation.Value)
                     );
                 }
             }

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
+using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Core.DI.Classes;
 using UniRx;
 using UnityEngine;
@@ -14,13 +16,18 @@ namespace _Project.Src.Common.GexGrid.Controllers
     {
         private readonly HexSetting _settings;
         private readonly CellSettings _cellSettings;
+        private readonly PlayerInputStorage _playerInputStorage;
+        private readonly Hand _hand;
         private readonly HexMap _map;
         private readonly Dictionary<Hex, HexView> _views = new();
 
-        public HexMapController(HexSetting settings, CellSettings cellSettings)
+        public HexMapController(HexSetting settings, CellSettings cellSettings, PlayerInputStorage playerInputStorage,
+            Hand hand)
         {
             _settings = settings;
             _cellSettings = cellSettings;
+            _playerInputStorage = playerInputStorage;
+            _hand = hand;
 
             _map = new HexMap(settings);
             _map.onCellAdded.Subscribe(OnCellAdded).AddTo(this);
@@ -73,8 +80,23 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         public void SetTile(Hex hex, CellModel cellModel)
         {
-            if (!_map.HasTile(hex))
-                _map.SetTile(hex, cellModel);
+            if (_map.HasTile(hex))
+                return;
+
+            if (cellModel.rotation.Value != _playerInputStorage.currentHexRotation.Value)
+            {
+                cellModel.SetRotation(_playerInputStorage.currentHexRotation.Value);
+            }
+
+            _map.SetTile(hex, cellModel);
+
+            var takeHexFromHand = _hand.TakeHexFromHand();
+
+            // Debug.LogWarning($"new tile is [{takeHexFromHand.GetSideTypes()}]");
+            // Debug.LogWarning($"new tile direction is [{takeHexFromHand.rotation.Value}], and global {_playerInputStorage.currentHexRotation.Value}");
+            // takeHexFromHand.SetRotation(_playerInputStorage.currentHexRotation.Value);
+
+            _playerInputStorage.SetCurrentCellModel(takeHexFromHand);
         }
 
         public void RemoveTile(Hex hex)

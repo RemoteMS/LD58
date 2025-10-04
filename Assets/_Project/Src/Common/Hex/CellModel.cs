@@ -27,7 +27,7 @@ namespace _Project.Src.Common.Hex
 
             for (var i = 0; i < 6; i++)
             {
-                _sides[i] = new SideData(Color.white, SideType.Grass);
+                _sides[i] = new SideData(SideType.Grass);
             }
         }
 
@@ -37,7 +37,7 @@ namespace _Project.Src.Common.Hex
 
             for (var i = 0; i < 6; i++)
             {
-                _sides[i] = new SideData(Color.white, SideType.Grass);
+                _sides[i] = new SideData(SideType.Grass);
             }
 
             _rotation = new ReactiveProperty<int>(rotation);
@@ -116,6 +116,12 @@ namespace _Project.Src.Common.Hex
             }
 
             _rotation.Value = rotation;
+        }
+
+        public string GetSideTypes()
+        {
+            return
+                $"[{_sides[0].Type}, {_sides[1].Type}, {_sides[2].Type}, {_sides[3].Type}, {_sides[4].Type}, {_sides[5].Type}]";
         }
 
         public void Dispose()

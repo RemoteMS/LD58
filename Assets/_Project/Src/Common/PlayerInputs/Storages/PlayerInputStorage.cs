@@ -29,7 +29,7 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 
             _currentHexRotation = new ReactiveProperty<int>(0);
             _currentHexRotation.AddTo(this);
-            
+
             _currentCellModel = new ReactiveProperty<CellModel>(null);
             _currentCellModel.AddTo(this);
         }
@@ -52,6 +52,11 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public void SetCurrentHexPosition(Vector3 position)
         {
             _currentHexPosition.Value = position;
+        }
+
+        public void SetCurrentCellModel(CellModel value)
+        {
+            _currentCellModel.Value = value;
         }
     }
 }

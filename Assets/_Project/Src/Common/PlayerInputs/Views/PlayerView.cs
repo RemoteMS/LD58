@@ -1,9 +1,13 @@
+using System;
+using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Core.DI.Classes;
 using LitMotion;
 using UniRx;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace _Project.Src.Common.PlayerInputs.Views
 {
@@ -18,15 +22,21 @@ namespace _Project.Src.Common.PlayerInputs.Views
         private Vector3 _position;
         private Quaternion _rotation;
 
-        public PlayerView(PlayerInputStorage storage, HexSetting setting)
+
+        private readonly PointerBinder _pointerBinder;
+
+        public PlayerView(PlayerInputStorage storage, HexSetting setting, CellSettings cellSettings)
         {
-            _pointer = Object.Instantiate(setting.hexPrefab);
+            _pointer = Object.Instantiate(setting.pointerPrefab);
             _settingHexRotationSpeed = setting.hexRotationSpeed;
+
+            _pointerBinder = new PointerBinder(cellSettings, _pointer);
+            _pointerBinder.AddTo(this);
 
             _position = _pointer.transform.position;
             _rotation = _pointer.transform.rotation;
 
-            storage.currentCellModel.Subscribe().AddTo(this);
+            storage.currentCellModel.Subscribe(x => OnCellModelChange(x)).AddTo(this);
             storage.currentHex.Subscribe().AddTo(this);
 
             storage.currentHexPosition
@@ -41,6 +51,18 @@ namespace _Project.Src.Common.PlayerInputs.Views
             var pvm = debug.AddComponent<PlayerViewMono>();
             pvm.Setup(storage);
 #endif
+        }
+
+        private void OnCellModelChange(CellModel cellModel)
+        {
+            if (cellModel == null)
+            {
+                _pointerBinder.Unbind();
+            }
+            else
+            {
+                _pointerBinder.Bind(cellModel);
+            }
         }
 
 
@@ -91,6 +113,82 @@ namespace _Project.Src.Common.PlayerInputs.Views
             {
                 Object.Destroy(_pointer);
             }
+        }
+    }
+
+
+    public class PointerBinder : IDisposable
+    {
+        private readonly GameObject _pointer;
+        private readonly CellSettings _cellSettings;
+
+        private readonly CompositeDisposable _disposables = new();
+
+        public IReadOnlyReactiveProperty<Material> material1 => _material1;
+        private readonly ReactiveProperty<Material> _material1;
+
+        public IReadOnlyReactiveProperty<Material> material2 => _material2;
+        private readonly ReactiveProperty<Material> _material2;
+
+        public IReadOnlyReactiveProperty<Material> material3 => _material3;
+        private readonly ReactiveProperty<Material> _material3;
+
+        public IReadOnlyReactiveProperty<Material> material4 => _material4;
+        private readonly ReactiveProperty<Material> _material4;
+
+        public IReadOnlyReactiveProperty<Material> material5 => _material5;
+        private readonly ReactiveProperty<Material> _material5;
+
+        public IReadOnlyReactiveProperty<Material> material6 => _material6;
+        private readonly ReactiveProperty<Material> _material6;
+
+        public PointerBinder(CellSettings cellSettings, GameObject pointer)
+        {
+            _cellSettings = cellSettings;
+            _pointer = pointer;
+
+            _material1 = new ReactiveProperty<Material>().AddTo(_disposables);
+            _material2 = new ReactiveProperty<Material>().AddTo(_disposables);
+            _material3 = new ReactiveProperty<Material>().AddTo(_disposables);
+            _material4 = new ReactiveProperty<Material>().AddTo(_disposables);
+            _material5 = new ReactiveProperty<Material>().AddTo(_disposables);
+            _material6 = new ReactiveProperty<Material>().AddTo(_disposables);
+
+            if (_pointer.TryGetComponent<Pointer>(out var pointerPointer))
+            {
+                pointerPointer.Bind(this);
+            }
+        }
+
+        public void Bind(CellModel model)
+        {
+            _material1.Value = _cellSettings.GetMaterialBy(model._sides[0].Type);
+            _material2.Value = _cellSettings.GetMaterialBy(model._sides[1].Type);
+            _material3.Value = _cellSettings.GetMaterialBy(model._sides[2].Type);
+            _material4.Value = _cellSettings.GetMaterialBy(model._sides[3].Type);
+            _material5.Value = _cellSettings.GetMaterialBy(model._sides[4].Type);
+            _material6.Value = _cellSettings.GetMaterialBy(model._sides[5].Type);
+        }
+
+        public void Unbind()
+        {
+            _material1.Value = null;
+            _material2.Value = null;
+            _material3.Value = null;
+            _material4.Value = null;
+            _material5.Value = null;
+            _material6.Value = null;
+        }
+
+        public void Dispose()
+        {
+            _disposables?.Dispose();
+            // _material1?.Dispose();
+            // _material2?.Dispose();
+            // _material3?.Dispose();
+            // _material4?.Dispose();
+            // _material5?.Dispose();
+            // _material6?.Dispose();
         }
     }
 }

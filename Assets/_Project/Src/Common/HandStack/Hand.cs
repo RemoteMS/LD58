@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using _Project.Src.Common.CellDatas;
 using _Project.Src.Common.Hex;
 using _Project.Src.Core.DI.Classes;
 using UniRx;
@@ -21,8 +23,25 @@ namespace _Project.Src.Common.HandStack
 
         public CellModel TakeHexFromHand()
         {
-            return new CellModel();
+            return new CellModel(0, new[]
+            {
+                new SideData(GetRandomSideType()),
+                new SideData(GetRandomSideType()),
+                new SideData(GetRandomSideType()),
+                new SideData(GetRandomSideType()),
+                new SideData(GetRandomSideType()),
+                new SideData(GetRandomSideType()),
+            });
         }
+
+        private Random random = new Random();
+
+        private SideType GetRandomSideType()
+        {
+            SideType[] sideTypes = (SideType[])Enum.GetValues(typeof(SideType));
+            return sideTypes[random.Next(0, sideTypes.Length)];
+        }
+
 
         public CellModel TakeHexFromHandAndReduceCount()
         {
