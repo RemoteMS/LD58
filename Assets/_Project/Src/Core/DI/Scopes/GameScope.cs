@@ -19,6 +19,7 @@ namespace _Project.Src.Core.DI.Scopes
         [SerializeField] private HexSetting tileSetting;
         [SerializeField] private CameraSettings cameraSettings;
         [SerializeField] private CellSettings cellSettings;
+        [SerializeField] private HandSettings handSettings;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -28,6 +29,7 @@ namespace _Project.Src.Core.DI.Scopes
             builder.RegisterComponent<HexSetting>(tileSetting).AsSelf();
             builder.RegisterComponent<CameraSettings>(cameraSettings).AsSelf();
             builder.RegisterComponent<CellSettings>(cellSettings).AsSelf();
+            builder.RegisterComponent<HandSettings>(handSettings).AsSelf();
 
             builder.Register<CameraMover>(lifetime: Lifetime.Singleton).AsSelf();
 
@@ -45,6 +47,7 @@ namespace _Project.Src.Core.DI.Scopes
                 c.Resolve<HexMapController>();
                 c.Resolve<HexMapDrawer>();
                 c.Resolve<PlayerView>();
+                c.Resolve<Hand>();
             });
         }
     }

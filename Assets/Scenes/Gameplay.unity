@@ -247,9 +247,13 @@ MonoBehaviour:
   cellSettings:
     materials:
     - type: 1
-      material: {fileID: 2100000, guid: 67886574d21f54ac3944c32721c8cde2, type: 2}
+      material: {fileID: 2100000, guid: 234064adf93e742448a71d59ea9c3538, type: 2}
     - type: 2
       material: {fileID: 2100000, guid: bd2cd06fc91ba48ca9f2bbe4886cdfde, type: 2}
+    - type: 0
+      material: {fileID: 2100000, guid: 8cc1e33447f784d419250ebfc8c060d7, type: 2}
+  handSettings:
+    initialCount: 70
 --- !u!1001 &217344642
 PrefabInstance:
   m_ObjectHideFlags: 0

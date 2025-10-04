@@ -1,3 +1,4 @@
+using UniRx;
 using UnityEngine;
 
 namespace _Project.Src.Common.Hex
@@ -11,6 +12,13 @@ namespace _Project.Src.Common.Hex
         {
             _controller = controller;
             _controller.BindView(this);
+
+            _controller.material1.Subscribe(x => { SetMaterialAt(1, x); }).AddTo(this);
+            _controller.material2.Subscribe(x => { SetMaterialAt(2, x); }).AddTo(this);
+            _controller.material3.Subscribe(x => { SetMaterialAt(3, x); }).AddTo(this);
+            _controller.material4.Subscribe(x => { SetMaterialAt(4, x); }).AddTo(this);
+            _controller.material5.Subscribe(x => { SetMaterialAt(5, x); }).AddTo(this);
+            _controller.material6.Subscribe(x => { SetMaterialAt(6, x); }).AddTo(this);
         }
 
         public void UpdateColor(Color color)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Core.DI.Classes;
@@ -12,12 +13,14 @@ namespace _Project.Src.Common.GexGrid.Controllers
     public class HexMapController : BaseService
     {
         private readonly HexSetting _settings;
+        private readonly CellSettings _cellSettings;
         private readonly HexMap _map;
         private readonly Dictionary<Hex, HexView> _views = new();
 
-        public HexMapController(HexSetting settings)
+        public HexMapController(HexSetting settings, CellSettings cellSettings)
         {
             _settings = settings;
+            _cellSettings = cellSettings;
 
             _map = new HexMap(settings);
             _map.onCellAdded.Subscribe(OnCellAdded).AddTo(this);
@@ -27,7 +30,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         private void OnCellAdded(HexMap.AddedCell cell)
         {
-            var controller = new CellController(cell.model);
+            var controller = new CellController(cell.model, _cellSettings);
 
             var viewObject = Object.Instantiate(_settings.hexPrefab);
             var view = viewObject.GetComponent<HexView>();
@@ -40,7 +43,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             view.Bind(controller);
 
             view.transform.position = HexToWorld(cell.hex);
-            // Синхронизируем визуальный поворот с CellModel
+
             cell.model.rotation.Subscribe(rotation =>
             {
                 view.transform.rotation = Quaternion.Euler(0, rotation * 60f, 0);

@@ -17,7 +17,7 @@ namespace _Project.Src.Common.Hex
         private readonly ReactiveProperty<bool> _isConnectedToCenter = new(false);
 
         // Data array for 6 sides of a hexagon
-        private readonly SideData[] _sides;
+        public readonly SideData[] _sides;
         public IReadOnlyReactiveProperty<int> rotation => _rotation;
         private readonly ReactiveProperty<int> _rotation = new(0); // Поворот (0–5)
 
@@ -27,7 +27,7 @@ namespace _Project.Src.Common.Hex
 
             for (var i = 0; i < 6; i++)
             {
-                _sides[i] = new SideData(Color.white);
+                _sides[i] = new SideData(Color.white, SideType.Grass);
             }
         }
 
@@ -37,8 +37,15 @@ namespace _Project.Src.Common.Hex
 
             for (var i = 0; i < 6; i++)
             {
-                _sides[i] = new SideData(Color.white);
+                _sides[i] = new SideData(Color.white, SideType.Grass);
             }
+
+            _rotation = new ReactiveProperty<int>(rotation);
+        }
+
+        public CellModel(int rotation, SideData[] data)
+        {
+            _sides = data;
 
             _rotation = new ReactiveProperty<int>(rotation);
         }
