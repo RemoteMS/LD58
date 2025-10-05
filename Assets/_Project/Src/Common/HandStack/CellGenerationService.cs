@@ -61,7 +61,7 @@ namespace _Project.Src.Common.HandStack
 
         public CellModel GetFullGrass()
         {
-            return new CellModel(0, new []
+            return new CellModel(0, new[]
             {
                 new SideData(SideType.Grass),
                 new SideData(SideType.Grass),
@@ -71,7 +71,7 @@ namespace _Project.Src.Common.HandStack
                 new SideData(SideType.Grass),
             });
         }
-        
+
         private SideData[] GenerateSidesBasedOnNeighbors(GexGrid.Hex hex)
         {
             var sides = new SideData[6];

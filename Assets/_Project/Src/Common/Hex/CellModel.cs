@@ -21,6 +21,14 @@ namespace _Project.Src.Common.Hex
         public IReadOnlyReactiveProperty<int> rotation => _rotation;
         private readonly ReactiveProperty<int> _rotation = new(0); // Поворот (0–5)
 
+        public IReadOnlyReactiveProperty<bool> containsTower => _containsTower;
+        private readonly ReactiveProperty<bool> _containsTower = new(false);
+
+        private void SetContainsTower(bool val)
+        {
+            _containsTower.Value = val;
+        }
+
         public CellModel()
         {
             _sides = new SideData[6];
@@ -29,18 +37,6 @@ namespace _Project.Src.Common.Hex
             {
                 _sides[i] = new SideData(SideType.Grass);
             }
-        }
-
-        public CellModel(int rotation)
-        {
-            _sides = new SideData[6];
-
-            for (var i = 0; i < 6; i++)
-            {
-                _sides[i] = new SideData(SideType.Grass);
-            }
-
-            _rotation = new ReactiveProperty<int>(rotation);
         }
 
         public CellModel(int rotation, SideData[] data)

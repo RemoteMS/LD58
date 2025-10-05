@@ -1,5 +1,9 @@
 using _Project.Src.Common.PlayerInputs.Settings;
 using _Project.Src.Core.DI.Classes;
+using LitMotion;
+using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
 using UnityEngine;
 
 namespace _Project.Src.Common.PlayerInputs
@@ -7,13 +11,106 @@ namespace _Project.Src.Common.PlayerInputs
     public class CameraMover : BaseService
     {
         private readonly CameraSettings _settings;
-
         private readonly Transform _cameraContainer;
+
+        private CancellationTokenSource _focusCts;
 
         public CameraMover(CameraSettings settings)
         {
             _settings = settings;
             _cameraContainer = settings.cameraContainer;
+        }
+
+        public void FocusOn(Vector3 worldPosition, float forTime = 0.5f, float waitTime = 1f)
+        {
+            FocusOn(worldPosition, forTime, waitTime, null);
+        }
+
+        public void FocusOn(Vector3 worldPosition, float forTime = 0.5f, float waitTime = 1f, Action callback = null)
+        {
+            CancelCurrentFocus();
+
+            _focusCts = new CancellationTokenSource();
+
+            FocusSequence(worldPosition, forTime, waitTime, callback, _focusCts.Token).Forget();
+        }
+
+        public void OnCallBack(Action callback)
+        {
+            if (_focusCts != null && !_focusCts.Token.IsCancellationRequested)
+            {
+                var cts = new CancellationTokenSource();
+                _focusCts = cts;
+
+                CallbackAfterFocus(callback, cts.Token).Forget();
+            }
+            else
+            {
+                callback?.Invoke();
+            }
+        }
+
+        private async UniTaskVoid FocusSequence(Vector3 worldPosition, float forTime, float waitTime, Action callback,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                Vector3 startPosition = _cameraContainer.position;
+
+                await LMotion.Create(startPosition, worldPosition, forTime)
+                    // .WithEase(_settings.easing)
+                    .Bind(newPosition => _cameraContainer.position = newPosition)
+                    .ToUniTask(cancellationToken: cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested) return;
+
+                await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested) return;
+
+                callback?.Invoke();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    _focusCts?.Dispose();
+                    _focusCts = null;
+                }
+            }
+        }
+
+        private async UniTaskVoid CallbackAfterFocus(Action callback, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await UniTask.NextFrame(cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested) return;
+
+                callback?.Invoke();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    _focusCts?.Dispose();
+                    _focusCts = null;
+                }
+            }
+        }
+
+        private void CancelCurrentFocus()
+        {
+            _focusCts?.Cancel();
+            _focusCts?.Dispose();
+            _focusCts = null;
         }
 
         public void SetMoveDirection(Vector3 dir)

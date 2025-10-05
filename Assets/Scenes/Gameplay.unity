@@ -260,6 +260,18 @@ MonoBehaviour:
       material: {fileID: 2100000, guid: 8cc1e33447f784d419250ebfc8c060d7, type: 2}
   handSettings:
     initialCount: 30
+  towerSpawnerSettings:
+    towers:
+    - type: 0
+      name: Lor Accurate
+      data:
+        towerName: New Tower
+        towerType: 1
+        towerRank: 0
+        abilities: []
+        requirements: []
+        hasTimer: 0
+        timerDuration: 0
 --- !u!1 &115802531
 GameObject:
   m_ObjectHideFlags: 0

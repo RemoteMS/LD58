@@ -1,3 +1,4 @@
+using LitMotion;
 using UnityEngine;
 
 namespace _Project.Src.Common.PlayerInputs.Settings
@@ -16,5 +17,9 @@ namespace _Project.Src.Common.PlayerInputs.Settings
         public float zoomMin = 0.5f;
         public float zoomMax = 100f;
 
+
+        [Header("Zoom settings")] public float zoomTime = 0.2f;
+        public float waitTime = 1f;
+        public LitMotion.Ease easing = Ease.InQuad;
     }
 }

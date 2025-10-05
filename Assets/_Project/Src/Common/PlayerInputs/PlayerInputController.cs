@@ -39,6 +39,9 @@ namespace _Project.Src.Common.PlayerInputs
 
         void ITickable.Tick()
         {
+            if (!_storage.playerHasControl.Value)
+                return;
+
             HandleRotateCurrentHex();
             HandleCamera();
 

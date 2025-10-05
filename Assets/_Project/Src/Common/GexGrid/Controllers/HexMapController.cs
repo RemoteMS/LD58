@@ -84,7 +84,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             return _map.WorldToHex(worldPos);
         }
 
-        public void SetTile(Hex hex, CellModel cellModel)
+        public void SetTile(Hex hex, CellModel cellModel, bool increment = true)
         {
             if (_map.HasTile(hex))
                 return;
@@ -96,7 +96,8 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
             _map.SetTile(hex, cellModel);
 
-            IncrementViewsTurnCount();
+            if (increment)
+                IncrementViewsTurnCount();
         }
 
         private void IncrementViewsTurnCount()
@@ -252,8 +253,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
-            Debug.Log(
-                $"Available neighbors for hex {hex.qrs}: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors;
         }
 
@@ -274,15 +273,12 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
-            Debug.Log($"All available neighbors: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors.ToList();
         }
 
         public List<Hex> GetAllAvailableNeighborsConnectedToCenter()
         {
             var availableNeighbors = _map.GetAllAvailableNeighborsConnectedToCenter();
-            Debug.Log(
-                $"Available neighbors connected to center: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors.ToList();
         }
 

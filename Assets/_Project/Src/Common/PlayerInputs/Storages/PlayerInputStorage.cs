@@ -7,6 +7,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 {
     public class PlayerInputStorage : BaseService
     {
+        public IReadOnlyReactiveProperty<bool> playerHasControl => _playerHasControl;
+        private readonly ReactiveProperty<bool> _playerHasControl;
+
         public IReadOnlyReactiveProperty<CellModel> currentCellModelInHand => _currentCellModelInHand;
         private readonly ReactiveProperty<CellModel> _currentCellModelInHand;
 
@@ -31,6 +34,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 
         public PlayerInputStorage()
         {
+            _playerHasControl = new ReactiveProperty<bool>(true);
+            _playerHasControl.AddTo(this);
+
             _currentHex = new ReactiveProperty<GexGrid.Hex>();
             _currentHex.AddTo(this);
 
@@ -91,6 +97,11 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public void SetHexOnAvailable(bool value)
         {
             _isHexOnAvailable.Value = value;
+        }
+
+        public void SetPlayerControl(bool value)
+        {
+            _playerHasControl.Value = value;
         }
     }
 }

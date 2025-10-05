@@ -1,5 +1,6 @@
 using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.GameProcessing;
+using _Project.Src.Common.GameProcessing.Settings;
 using _Project.Src.Common.GexGrid;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
@@ -22,6 +23,7 @@ namespace _Project.Src.Core.DI.Scopes
         [SerializeField] private CameraSettings cameraSettings;
         [SerializeField] private CellSettings cellSettings;
         [SerializeField] private HandSettings handSettings;
+        [SerializeField] private TowerSpawnerSettings towerSpawnerSettings;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -32,6 +34,7 @@ namespace _Project.Src.Core.DI.Scopes
             builder.RegisterComponent<CameraSettings>(cameraSettings).AsSelf();
             builder.RegisterComponent<CellSettings>(cellSettings).AsSelf();
             builder.RegisterComponent<HandSettings>(handSettings).AsSelf();
+            builder.RegisterComponent<TowerSpawnerSettings>(towerSpawnerSettings).AsSelf();
 
             builder.Register<HexMap>(lifetime: Lifetime.Singleton).AsSelf();
 
@@ -45,12 +48,14 @@ namespace _Project.Src.Core.DI.Scopes
             builder.Register<AvailableHexesController>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<Hand>(lifetime: Lifetime.Singleton).AsSelf();
 
+            builder.Register<TowerSpawner>(lifetime: Lifetime.Singleton).AsSelf();
+
             builder.Register<PlayerInputStorage>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<PlayerView>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.Register<GameTurnCounter>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<TurnActionService>(lifetime: Lifetime.Singleton).AsSelf();
-            
+
             builder.Register<CellGenerationService>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.RegisterBuildCallback(c =>
@@ -63,6 +68,7 @@ namespace _Project.Src.Core.DI.Scopes
 
                 c.Resolve<GameTurnCounter>();
                 c.Resolve<CellGenerationService>();
+                c.Resolve<TowerSpawner>();
             });
         }
     }
