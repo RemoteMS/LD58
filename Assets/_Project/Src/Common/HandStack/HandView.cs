@@ -59,14 +59,18 @@ namespace _Project.Src.Common.HandStack
             var worldPosition = _tilesParent.TransformPoint(localPosition);
             var tile = Instantiate(hexPrefab, worldPosition, Quaternion.identity, _tilesParent);
 
-            var randomRot = Random.Range(-randomRotationMax, randomRotationMax);
-            tile.transform.Rotate(Vector3.up, randomRot);
+            // var randomRot = Random.Range(-randomRotationMax, randomRotationMax);
+            // tile.transform.Rotate(Vector3.up, randomRot);
 
             return tile;
         }
 
         private void UpdateStack(int newCount)
         {
+            // update count 
+            // removing first 3 elements because of views  
+            newCount -= 3;
+
             var visibleTiles = Mathf.Min(newCount, maxVisibleTiles);
             var currentActiveCount = _activeTiles.Count;
 

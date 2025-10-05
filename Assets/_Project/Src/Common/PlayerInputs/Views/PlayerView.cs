@@ -1,5 +1,6 @@
 using System;
 using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
@@ -26,7 +27,7 @@ namespace _Project.Src.Common.PlayerInputs.Views
         private readonly PointerBinder _pointerBinder;
         private readonly Vector3 _hiddenPosition = new Vector3(0, 1000, 0);
 
-        public PlayerView(PlayerInputStorage storage, HexSetting setting, CellSettings cellSettings)
+        public PlayerView(PlayerInputStorage storage, HexSetting setting, CellSettings cellSettings, Hand hand)
         {
             _pointer = Object.Instantiate(setting.pointerPrefab);
             _settingHexRotationSpeed = setting.hexRotationSpeed;
@@ -37,12 +38,17 @@ namespace _Project.Src.Common.PlayerInputs.Views
             _position = _pointer.transform.position;
             _rotation = _pointer.transform.rotation;
 
-            storage.currentCellModel.Subscribe(x => OnCellModelChange(x)).AddTo(this);
+            storage.currentCellModelInHand.Subscribe(x => OnCellModelChange(x)).AddTo(this);
             storage.currentHexRotation.Subscribe(RotateOnIndex).AddTo(this);
 
+
             storage.currentHexPosition
-                .CombineLatest(storage.isHexOnAvailable, (pos, isAvailable) => (pos, isAvailable))
-                .Subscribe(x => SetPosition(x.isAvailable ? x.pos : _hiddenPosition))
+                .CombineLatest(
+                    storage.isHexOnAvailable,
+                    hand.count,
+                    (pos, isAvailable, handCount) => (pos, isAvailable, handCount)
+                )
+                .Subscribe(x => SetPosition(x.isAvailable && x.handCount > 0 ? x.pos : _hiddenPosition))
                 .AddTo(this);
 
 #if UNITY_EDITOR
@@ -182,12 +188,6 @@ namespace _Project.Src.Common.PlayerInputs.Views
         public void Dispose()
         {
             _disposables?.Dispose();
-            // _material1?.Dispose();
-            // _material2?.Dispose();
-            // _material3?.Dispose();
-            // _material4?.Dispose();
-            // _material5?.Dispose();
-            // _material6?.Dispose();
         }
     }
 }

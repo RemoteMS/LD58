@@ -1,27 +1,59 @@
 using System;
-using System.Collections.Generic;
 using _Project.Src.Common.CellDatas;
 using _Project.Src.Common.Hex;
+using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Core.DI.Classes;
 using UniRx;
+using UnityEngine;
+using Random = System.Random;
 
 namespace _Project.Src.Common.HandStack
 {
     public class Hand : BaseService
     {
+        private readonly PlayerInputStorage _storage;
         public IReadOnlyReactiveProperty<int> count => _count;
         private readonly ReactiveProperty<int> _count;
 
+        public IReadOnlyReactiveProperty<CellModel> firstInQueue => _firstInQueue;
+        private ReactiveProperty<CellModel> _firstInQueue = new(null);
 
-        private List<int> _hand;
-
-        public Hand(HandSettings settings)
+        public Hand(HandSettings settings, PlayerInputStorage storage)
         {
+            _storage = storage;
             _count = new ReactiveProperty<int>(settings.initialCount);
-            _hand = new();
+
+            storage.SetCurrentCellModel(GetRandomCellModel());
+            storage.SetNextCellModel(GetRandomCellModel());
+            storage.SetThirdCellModel(GetRandomCellModel());
         }
 
         public CellModel TakeHexFromHand()
+        {
+            if (count.Value == 0)
+            {
+                Debug.LogError($"count.Value is 0");
+                throw new ArgumentException("count.Value is 0");
+            }
+
+            var value = _storage.currentCellModelInHand.Value;
+
+            _storage.SetCurrentCellModel(_storage.secondCellModelInHand.Value);
+            _storage.SetNextCellModel(_storage.thirdCellModelInHand.Value);
+
+            if (count.Value > 3)
+            {
+                _storage.SetThirdCellModel(GetRandomCellModel());
+            }
+            else
+            {
+                _storage.SetThirdCellModel(null);
+            }
+
+            return value;
+        }
+
+        public CellModel GetRandomCellModel()
         {
             return new CellModel(0, new[]
             {
@@ -42,20 +74,53 @@ namespace _Project.Src.Common.HandStack
             return sideTypes[random.Next(0, sideTypes.Length)];
         }
 
-
         public CellModel TakeHexFromHandAndReduceCount()
         {
+            var temp = TakeHexFromHand();
             _count.Value -= 1;
-            return TakeHexFromHand();
+            return temp;
         }
 
-        // todo: 
-        public void AddToHandEnd()
+        public void AddToHandEnd(CellModel model)
         {
+            if (_storage.thirdCellModelInHand.Value == null)
+            {
+                _storage.SetThirdCellModel(model);
+                _count.Value += 1;
+                ShiftHandSlots(); // Переносим элементы после добавления
+            }
+            else
+            {
+                Debug.LogWarning("Cannot add to hand: thirdCellModelInHand is already occupied.");
+            }
+        }
+
+        public void ShiftHandSlots()
+        {
+            bool shifted;
+            do
+            {
+                shifted = false;
+
+                if (_storage.secondCellModelInHand.Value == null && _storage.thirdCellModelInHand.Value != null)
+                {
+                    _storage.SetNextCellModel(_storage.thirdCellModelInHand.Value);
+                    _storage.SetThirdCellModel(null);
+                    shifted = true;
+                }
+
+                if (_storage.currentCellModelInHand.Value == null && _storage.secondCellModelInHand.Value != null)
+                {
+                    _storage.SetCurrentCellModel(_storage.secondCellModelInHand.Value);
+                    _storage.SetNextCellModel(null);
+                    shifted = true;
+                }
+            } while (shifted);
         }
 
         public void TakeFirstAndRemoveFromStack()
         {
+            // Метод пока не реализован, оставлен как заглушка
         }
     }
 }

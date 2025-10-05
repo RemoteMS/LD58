@@ -6,6 +6,7 @@ namespace _Project.Src.Common.Hex
     public class HexView : MonoBehaviour
     {
         [SerializeField] private MeshRenderer _renderer;
+        [SerializeField] private GameObject _rendererContainer;
         private CellController _controller;
 
         public void Bind(CellController controller)
@@ -19,6 +20,16 @@ namespace _Project.Src.Common.Hex
             _controller.material4.Subscribe(x => { SetMaterialAt(4, x); }).AddTo(this);
             _controller.material5.Subscribe(x => { SetMaterialAt(5, x); }).AddTo(this);
             _controller.material6.Subscribe(x => { SetMaterialAt(6, x); }).AddTo(this);
+        }
+
+        public void EnableRendererContainer()
+        {
+            _rendererContainer.gameObject.SetActive(true);
+        }
+
+        public void DisableRendererContainer()
+        {
+            _rendererContainer.gameObject.SetActive(false);
         }
 
         public void UpdateColor(Color color)

@@ -7,11 +7,18 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 {
     public class PlayerInputStorage : BaseService
     {
+        public IReadOnlyReactiveProperty<CellModel> currentCellModelInHand => _currentCellModelInHand;
+        private readonly ReactiveProperty<CellModel> _currentCellModelInHand;
+
+        public IReadOnlyReactiveProperty<CellModel> secondCellModelInHand => _secondCellModelInHand;
+        private readonly ReactiveProperty<CellModel> _secondCellModelInHand;
+
+        public IReadOnlyReactiveProperty<CellModel> thirdCellModelInHand => _thirdCellModelInHand;
+        private readonly ReactiveProperty<CellModel> _thirdCellModelInHand;
+
         public IReadOnlyReactiveProperty<bool> isHexOnAvailable => _isHexOnAvailable;
         private readonly ReactiveProperty<bool> _isHexOnAvailable;
 
-        public IReadOnlyReactiveProperty<CellModel> currentCellModel => _currentCellModel;
-        private readonly ReactiveProperty<CellModel> _currentCellModel;
 
         public IReadOnlyReactiveProperty<GexGrid.Hex> currentHex => _currentHex;
         private readonly ReactiveProperty<GexGrid.Hex> _currentHex;
@@ -33,8 +40,14 @@ namespace _Project.Src.Common.PlayerInputs.Storages
             _currentHexRotation = new ReactiveProperty<int>(0);
             _currentHexRotation.AddTo(this);
 
-            _currentCellModel = new ReactiveProperty<CellModel>(null);
-            _currentCellModel.AddTo(this);
+            _currentCellModelInHand = new ReactiveProperty<CellModel>(null);
+            _currentCellModelInHand.AddTo(this);
+
+            _secondCellModelInHand = new ReactiveProperty<CellModel>(null);
+            _secondCellModelInHand.AddTo(this);
+
+            _thirdCellModelInHand = new ReactiveProperty<CellModel>(null);
+            _thirdCellModelInHand.AddTo(this);
 
             _isHexOnAvailable = new ReactiveProperty<bool>(false);
             _isHexOnAvailable.AddTo(this);
@@ -62,7 +75,17 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 
         public void SetCurrentCellModel(CellModel value)
         {
-            _currentCellModel.Value = value;
+            _currentCellModelInHand.Value = value;
+        }
+
+        public void SetNextCellModel(CellModel value)
+        {
+            _secondCellModelInHand.Value = value;
+        }
+
+        public void SetThirdCellModel(CellModel value)
+        {
+            _thirdCellModelInHand.Value = value;
         }
 
         public void SetHexOnAvailable(bool value)

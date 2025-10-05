@@ -1,4 +1,5 @@
 using _Project.Src.Common.GexGrid.Controllers;
+using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
@@ -16,14 +17,17 @@ namespace _Project.Src.Common.PlayerInputs
 
         private readonly CameraMover _cameraMover;
         private readonly HexSetting _settings;
+        private readonly Hand _hand;
 
         public PlayerInputController(HexMapController controller, PlayerInputStorage storage, CameraMover cameraMover,
-            HexSetting settings)
+            HexSetting settings,
+            Hand hand)
         {
             _controller = controller;
             _storage = storage;
             _cameraMover = cameraMover;
             _settings = settings;
+            _hand = hand;
 
 
             _camera = Camera.main;
@@ -42,6 +46,16 @@ namespace _Project.Src.Common.PlayerInputs
             HandleHexPlacing();
 
             HandleAddTower();
+
+            HandleAddNewTile();
+        }
+
+        private void HandleAddNewTile()
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                _hand.AddToHandEnd(_hand.GetRandomCellModel());
+            }
         }
 
         private void HandleRotateCurrentHex()
@@ -121,12 +135,13 @@ namespace _Project.Src.Common.PlayerInputs
                         return;
                     }
 
-                    var hexCenter = _controller.HexToWorld(hex);
-                    _controller.SetTile(
-                        hex,
-                        _storage.currentCellModel.Value
-                        // new CellModel(rotation: _storage.currentHexRotation.Value)
-                    );
+                    if (_hand.count.Value > 0)
+                    {
+                        _controller.SetTile(
+                            hex,
+                            _hand.TakeHexFromHandAndReduceCount()
+                        );
+                    }
                 }
             }
         }
