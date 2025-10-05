@@ -26,9 +26,9 @@ namespace _Project.Src.Common.HandStack
 
             _count = new ReactiveProperty<int>(settings.initialCount);
 
-            storage.SetCurrentCellModel(GetRandomCellModel());
-            storage.SetNextCellModel(GetRandomCellModel());
-            storage.SetThirdCellModel(GetRandomCellModel());
+            storage.SetCurrentCellModel(_cellGeneration.GetFullGrass());
+            storage.SetNextCellModel(_cellGeneration.GetFullGrass());
+            storage.SetThirdCellModel(_cellGeneration.GetFullGrass());
         }
 
         public CellModel TakeHexFromHand()
