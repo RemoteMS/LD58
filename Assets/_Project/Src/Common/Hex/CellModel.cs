@@ -6,6 +6,10 @@ namespace _Project.Src.Common.Hex
 {
     public class CellModel : IDisposable
     {
+        // todo: rework somehow
+        private static int ID = 0;
+
+        public readonly int id;
         public IObservable<Unit> beforeDispose => _beforeDispose;
         private readonly Subject<Unit> _beforeDispose = new();
 
@@ -26,6 +30,7 @@ namespace _Project.Src.Common.Hex
 
         public CellModel()
         {
+            id = ID++;
             _sides = new SideData[6];
             for (var i = 0; i < 6; i++)
             {
@@ -35,6 +40,7 @@ namespace _Project.Src.Common.Hex
 
         public CellModel(int rotation, SideData[] data)
         {
+            id = ID++;
             _sides = data;
             _rotation = new ReactiveProperty<int>(rotation);
         }

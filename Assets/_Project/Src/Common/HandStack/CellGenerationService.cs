@@ -20,6 +20,57 @@ namespace _Project.Src.Common.HandStack
             _cellSettings = cellSettings;
         }
 
+        public CellModel GetCellBasedOnTurnProgression(int currentTurn)
+        {
+            // Прогрессия по ходам
+            if (currentTurn > 30)
+            {
+                // Поздняя игра: города и разнообразие
+                return GetWeightedRandomCellModel(new[]
+                {
+                    (SideType.Grass, 2),
+                    (SideType.Forest, 3),
+                    (SideType.City, 4),
+                    (SideType.Sea, 1)
+                });
+            }
+            else if (currentTurn > 20)
+            {
+                // Средняя игра: добавляем города
+                return GetWeightedRandomCellModel(new[]
+                {
+                    (SideType.Grass, 3),
+                    (SideType.Forest, 4),
+                    (SideType.City, 2),
+                    (SideType.Sea, 1)
+                });
+            }
+            else if (currentTurn > 10)
+            {
+                // Ранняя-средняя игра: добавляем леса
+                return GetWeightedRandomCellModel(new[]
+                {
+                    (SideType.Grass, 5),
+                    (SideType.Forest, 3),
+                    (SideType.Sea, 2)
+                });
+            }
+            else if (currentTurn > 4)
+            {
+                // Очень ранняя игра: в основном трава, немного леса
+                return GetWeightedRandomCellModel(new[]
+                {
+                    (SideType.Grass, 8),
+                    (SideType.Forest, 2)
+                });
+            }
+            else
+            {
+                // Самые первые ходы - только трава
+                return GetFullGrass();
+            }
+        }
+
         public CellModel GetRandomBestHexBasedNeighbors()
         {
             var available = _mapController.GetAllAvailableNeighborsConnectedToCenter();
@@ -30,11 +81,7 @@ namespace _Project.Src.Common.HandStack
             }
 
             var randomHex = available[Random.Range(0, available.Count)];
-
-
             var sides = GenerateSidesBasedOnNeighbors(randomHex);
-
-
             var model = new CellModel(0, sides);
 
             return model;
@@ -50,14 +97,11 @@ namespace _Project.Src.Common.HandStack
             }
 
             var randomHex = available[Random.Range(0, available.Count)];
-
             var sides = GenerateSidesBasedOnNeighbors(randomHex);
-
             var model = new CellModel(0, sides);
 
             _mapController.SetTile(randomHex, model);
         }
-
 
         public CellModel GetFullGrass()
         {
@@ -70,6 +114,41 @@ namespace _Project.Src.Common.HandStack
                 new SideData(SideType.Grass),
                 new SideData(SideType.Grass),
             });
+        }
+
+        private CellModel GetWeightedRandomCellModel((SideType type, int weight)[] weightedTypes)
+        {
+            var sides = new SideData[6];
+
+            for (int i = 0; i < 6; i++)
+            {
+                sides[i] = new SideData(GetWeightedRandomSideType(weightedTypes));
+            }
+
+            return new CellModel(0, sides);
+        }
+
+        private SideType GetWeightedRandomSideType((SideType type, int weight)[] weightedTypes)
+        {
+            int totalWeight = 0;
+            foreach (var weightedType in weightedTypes)
+            {
+                totalWeight += weightedType.weight;
+            }
+
+            int randomValue = Random.Range(0, totalWeight);
+            int currentWeight = 0;
+
+            foreach (var weightedType in weightedTypes)
+            {
+                currentWeight += weightedType.weight;
+                if (randomValue < currentWeight)
+                {
+                    return weightedType.type;
+                }
+            }
+
+            return SideType.Grass; // fallback
         }
 
         private SideData[] GenerateSidesBasedOnNeighbors(GexGrid.Hex hex)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Src.Common.CellDatas.Settings;
@@ -9,6 +10,7 @@ using _Project.Src.Core.DI.Classes;
 using UniRx;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace _Project.Src.Common.GexGrid.Controllers
 {
@@ -288,11 +290,13 @@ namespace _Project.Src.Common.GexGrid.Controllers
             return _map.GetTile(hex);
         }
 
-        public bool CanPlaceTile(Hex hex, CellModel newTile, int rotation)
+        public (bool success, int neighborCount) CanPlaceTile(Hex hex, CellModel newTile, int rotation)
         {
+            // Клонируем модель, чтобы не изменять оригинал
             var clone = newTile.Clone();
             clone.SetRotation(rotation);
 
+            // Получаем занятых соседей
             var occupiedNeighbors = new List<Hex>();
             for (var i = 0; i < 6; i++)
             {
@@ -303,9 +307,11 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
-            if (occupiedNeighbors.Count == 0)
+            int neighborCount = occupiedNeighbors.Count;
+
+            if (neighborCount == 0)
             {
-                return true;
+                return (true, neighborCount);
             }
 
             foreach (var neighborHex in occupiedNeighbors)
@@ -323,11 +329,11 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 {
                     Debug.LogWarning(
                         $"Cannot place tile at {hex.qrs}: Side mismatch with neighbor {neighborHex.qrs} ({newTileSide.Type} != {neighborSide.Type})");
-                    return false;
+                    return (false, neighborCount);
                 }
             }
 
-            return true;
+            return (true, neighborCount);
         }
 
         private int GetSideIndexForNeighbor(Hex from, Hex to)
@@ -340,7 +346,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
-            throw new System.ArgumentException($"Hex {to.qrs} is not a neighbor of {from.qrs}");
+            throw new ArgumentException($"Hex {to.qrs} is not a neighbor of {from.qrs}");
         }
     }
 }

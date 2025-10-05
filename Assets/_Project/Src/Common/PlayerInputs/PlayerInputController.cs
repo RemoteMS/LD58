@@ -3,7 +3,9 @@ using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
+using _Project.Src.Common.Points;
 using _Project.Src.Core.DI.Classes;
+using Unity.Mathematics;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -12,6 +14,8 @@ namespace _Project.Src.Common.PlayerInputs
     public class PlayerInputController : BaseService, IStartable, ITickable
     {
         private readonly Camera _camera;
+        private readonly CellGenerationService _cellGeneration;
+        private readonly PointService _pointService;
         private readonly HexMapController _controller;
         private readonly PlayerInputStorage _storage;
 
@@ -20,12 +24,16 @@ namespace _Project.Src.Common.PlayerInputs
         private readonly Hand _hand;
 
         public PlayerInputController(
+            CellGenerationService cellGeneration,
+            PointService pointService,
             HexMapController controller,
             PlayerInputStorage storage,
             CameraMover cameraMover,
             HexSetting settings,
             Hand hand)
         {
+            _cellGeneration = cellGeneration;
+            _pointService = pointService;
             _controller = controller;
             _storage = storage;
             _cameraMover = cameraMover;
@@ -51,8 +59,6 @@ namespace _Project.Src.Common.PlayerInputs
             GetAndSetCurrentHex();
             HandleHexPlacing();
 
-            HandleAddTower();
-
             HandleAddNewTile();
         }
 
@@ -74,30 +80,6 @@ namespace _Project.Src.Common.PlayerInputs
             else if (Input.GetKeyDown(KeyCode.T))
             {
                 _storage.RotateHexCounterclockwise();
-            }
-        }
-
-        private void HandleAddTower()
-        {
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                var findHexAtDistanceFromConnected = _controller.FindRandomHexAtDistanceFromConnected(5);
-
-                Debug.LogWarning($"random hex - {findHexAtDistanceFromConnected.qrs}");
-                _controller.SetTile(findHexAtDistanceFromConnected, new CellModel());
-            }
-
-            if (Input.GetKeyUp(KeyCode.Z))
-            {
-                var allAvailableNeighbors = _controller.GetAllAvailableNeighbors();
-                foreach (var neighbor in allAvailableNeighbors)
-                {
-                    Object.Instantiate(
-                        _settings.emptyAvailableHexPrefab,
-                        _controller.HexToWorld(neighbor),
-                        Quaternion.identity
-                    );
-                }
             }
         }
 
@@ -148,19 +130,31 @@ namespace _Project.Src.Common.PlayerInputs
                         CellModel currentModel = _storage.currentCellModelInHand.Value;
                         int rotation = _storage.currentHexRotation.Value;
 
-                        // Проверяем, можно ли разместить тайл с текущим поворотом
                         var cellModel = currentModel.Clone();
-                        if (_controller.CanPlaceTile(hex, cellModel, rotation))
+                        var (canPlace, neighborCount) = _controller.CanPlaceTile(hex, cellModel, rotation);
+
+                        if (canPlace)
                         {
                             currentModel.SetRotation(rotation);
                             _controller.SetTile(
                                 hex,
                                 _hand.TakeHexFromHandAndReduceCount()
                             );
+
+                            if (neighborCount > 1)
+                            {
+                                _pointService.AddPoints(neighborCount * 10);
+                            }
+
+                            if (neighborCount == 6)
+                            {
+                                Debug.Log("Full circle! Bonus!");
+                            }
                         }
                         else
                         {
-                            Debug.LogWarning("Cannot place tile: Side types do not match with neighbors.");
+                            Debug.LogWarning(
+                                $"Cannot place tile: Side types do not match with {neighborCount} neighbors.");
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 using System;
 using _Project.Src.Common.CellDatas;
+using _Project.Src.Common.GameProcessing;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Core.DI.Classes;
@@ -13,16 +14,23 @@ namespace _Project.Src.Common.HandStack
     {
         private readonly PlayerInputStorage _storage;
         private readonly CellGenerationService _cellGeneration;
+        private readonly GameTurnCounter _turnCounter;
         public IReadOnlyReactiveProperty<int> count => _count;
         private readonly ReactiveProperty<int> _count;
 
         public IReadOnlyReactiveProperty<CellModel> firstInQueue => _firstInQueue;
-        private ReactiveProperty<CellModel> _firstInQueue = new(null);
+        private readonly ReactiveProperty<CellModel> _firstInQueue = new(null);
 
-        public Hand(HandSettings settings, PlayerInputStorage storage, CellGenerationService cellGeneration)
+        public Hand(
+            HandSettings settings,
+            PlayerInputStorage storage,
+            CellGenerationService cellGeneration,
+            GameTurnCounter turnCounter
+        )
         {
             _storage = storage;
             _cellGeneration = cellGeneration;
+            _turnCounter = turnCounter;
 
             _count = new ReactiveProperty<int>(settings.initialCount);
 
@@ -58,8 +66,7 @@ namespace _Project.Src.Common.HandStack
 
         private CellModel GetBest()
         {
-            // return GetRandomCellModel();
-            return _cellGeneration.GetRandomBestHexBasedNeighbors();
+            return _cellGeneration.GetCellBasedOnTurnProgression(_turnCounter.currentTurn.Value);
         }
 
         public CellModel GetRandomCellModel()
@@ -130,6 +137,28 @@ namespace _Project.Src.Common.HandStack
         public void TakeFirstAndRemoveFromStack()
         {
             // Метод пока не реализован, оставлен как заглушка
+        }
+
+
+        public void IncreaseCardCount(int amount)
+        {
+            _count.Value += amount;
+
+            // Если карт стало меньше 3, добавляем недостающие
+            while (_count.Value > 0 && GetCurrentHandSize() < 3 && GetCurrentHandSize() < _count.Value)
+            {
+                AddToHandEnd(GetBest());
+            }
+        }
+
+// Вспомогательный метод для получения текущего количества карт в слотах руки
+        private int GetCurrentHandSize()
+        {
+            var size = 0;
+            if (_storage.currentCellModelInHand.Value != null) size++;
+            if (_storage.secondCellModelInHand.Value  != null) size++;
+            if (_storage.thirdCellModelInHand.Value   != null) size++;
+            return size;
         }
     }
 }

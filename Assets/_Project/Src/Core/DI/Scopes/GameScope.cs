@@ -12,6 +12,7 @@ using _Project.Src.Common.PlayerInputs;
 using _Project.Src.Common.PlayerInputs.Settings;
 using _Project.Src.Common.PlayerInputs.Storages;
 using _Project.Src.Common.PlayerInputs.Views;
+using _Project.Src.Common.Points;
 using _Project.Src.Core.Inputs;
 using UnityEngine;
 using VContainer;
@@ -64,6 +65,8 @@ namespace _Project.Src.Core.DI.Scopes
 
             builder.Register<CellGenerationService>(lifetime: Lifetime.Singleton).AsSelf();
 
+            builder.Register<PointService>(lifetime: Lifetime.Singleton).AsSelf();
+
             builder.RegisterBuildCallback(c =>
             {
                 c.Resolve<HexMapController>();
@@ -78,6 +81,7 @@ namespace _Project.Src.Core.DI.Scopes
                 c.Resolve<TowersModels>();
                 c.Resolve<TowersControllers>();
                 c.Resolve<TowerViews>();
+                c.Resolve<PointService>();
             });
         }
     }

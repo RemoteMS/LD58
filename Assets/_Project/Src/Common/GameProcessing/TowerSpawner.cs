@@ -17,6 +17,7 @@ namespace _Project.Src.Common.GameProcessing
         private readonly CameraMover _cameraMover;
         private readonly CameraSettings _settings;
         private readonly Storage.TowersModels _towersModels;
+        private readonly GameTurnCounter _turnCounter;
 
         public TowerSpawner(
             GameTurnCounter counter,
@@ -25,7 +26,8 @@ namespace _Project.Src.Common.GameProcessing
             CellGenerationService cellGeneration,
             CameraMover cameraMover,
             CameraSettings settings,
-            Storage.TowersModels towersModels
+            Storage.TowersModels towersModels,
+            GameTurnCounter turnCounter
         )
         {
             _controller = controller;
@@ -34,6 +36,7 @@ namespace _Project.Src.Common.GameProcessing
             _cameraMover = cameraMover;
             _settings = settings;
             _towersModels = towersModels;
+            _turnCounter = turnCounter;
 
             counter.currentTurn
                 .Where(x => x % 10 == 0)
@@ -54,10 +57,13 @@ namespace _Project.Src.Common.GameProcessing
             };
 
 
+            // create tower create
+
             _controller.SetTile(
                 findHexAtDistanceFromConnected,
-                _cellGeneration.GetFullGrass(),
-                incrementTurn: false
+                _cellGeneration.GetCellBasedOnTurnProgression(_turnCounter.currentTurn.Value),
+                incrementTurn:
+                false
             );
 
             _towersModels.Add(tower);
