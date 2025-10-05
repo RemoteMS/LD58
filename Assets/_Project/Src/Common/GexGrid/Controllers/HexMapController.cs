@@ -84,7 +84,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             return _map.WorldToHex(worldPos);
         }
 
-        public void SetTile(Hex hex, CellModel cellModel, bool increment = true)
+        public void SetTile(Hex hex, CellModel cellModel, bool incrementTurn = true)
         {
             if (_map.HasTile(hex))
                 return;
@@ -96,7 +96,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
             _map.SetTile(hex, cellModel);
 
-            if (increment)
+            if (incrementTurn)
                 IncrementViewsTurnCount();
         }
 

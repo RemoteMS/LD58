@@ -250,6 +250,9 @@ MonoBehaviour:
     zoomSpeed: 30
     zoomMin: 1
     zoomMax: 50
+    zoomTime: 0.2
+    waitTime: 1
+    easing: 25
   cellSettings:
     materials:
     - type: 1
@@ -262,7 +265,8 @@ MonoBehaviour:
     initialCount: 30
   towerSpawnerSettings:
     towers:
-    - type: 0
+    - wordPos: {x: 0, y: 0, z: 0}
+      type: 0
       name: Lor Accurate
       data:
         towerName: New Tower
@@ -272,6 +276,10 @@ MonoBehaviour:
         requirements: []
         hasTimer: 0
         timerDuration: 0
+    settings:
+      towerPrefab1: {fileID: 689568416420774376, guid: 0444b1110aa214052833816de36fcbfe, type: 3}
+      towerPrefab2: {fileID: 689568416420774376, guid: 0444b1110aa214052833816de36fcbfe, type: 3}
+      towerPrefab3: {fileID: 689568416420774376, guid: 0444b1110aa214052833816de36fcbfe, type: 3}
 --- !u!1 &115802531
 GameObject:
   m_ObjectHideFlags: 0

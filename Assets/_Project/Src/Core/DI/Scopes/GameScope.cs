@@ -1,6 +1,8 @@
 using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.GameProcessing;
 using _Project.Src.Common.GameProcessing.Settings;
+using _Project.Src.Common.GameProcessing.Storage;
+using _Project.Src.Common.GameProcessing.Views;
 using _Project.Src.Common.GexGrid;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
@@ -48,6 +50,10 @@ namespace _Project.Src.Core.DI.Scopes
             builder.Register<AvailableHexesController>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<Hand>(lifetime: Lifetime.Singleton).AsSelf();
 
+            builder.Register<TowersModels>(lifetime: Lifetime.Singleton).AsSelf();
+            builder.Register<TowersControllers>(lifetime: Lifetime.Singleton).AsSelf();
+            builder.Register<TowerViews>(lifetime: Lifetime.Singleton).AsSelf();
+
             builder.Register<TowerSpawner>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.Register<PlayerInputStorage>(lifetime: Lifetime.Singleton).AsSelf();
@@ -69,6 +75,9 @@ namespace _Project.Src.Core.DI.Scopes
                 c.Resolve<GameTurnCounter>();
                 c.Resolve<CellGenerationService>();
                 c.Resolve<TowerSpawner>();
+                c.Resolve<TowersModels>();
+                c.Resolve<TowersControllers>();
+                c.Resolve<TowerViews>();
             });
         }
     }

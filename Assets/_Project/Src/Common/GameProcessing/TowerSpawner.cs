@@ -3,6 +3,7 @@ using _Project.Src.Common.HandStack;
 using _Project.Src.Common.PlayerInputs;
 using _Project.Src.Common.PlayerInputs.Settings;
 using _Project.Src.Common.PlayerInputs.Storages;
+using _Project.Src.Common.Towers;
 using _Project.Src.Core.DI.Classes;
 using UniRx;
 using UnityEngine;
@@ -16,6 +17,7 @@ namespace _Project.Src.Common.GameProcessing
         private readonly CellGenerationService _cellGeneration;
         private readonly CameraMover _cameraMover;
         private readonly CameraSettings _settings;
+        private readonly Storage.TowersModels _towersModels;
 
         public TowerSpawner(
             GameTurnCounter counter,
@@ -23,7 +25,8 @@ namespace _Project.Src.Common.GameProcessing
             PlayerInputStorage storage,
             CellGenerationService cellGeneration,
             CameraMover cameraMover,
-            CameraSettings settings
+            CameraSettings settings,
+            Storage.TowersModels towersModels
         )
         {
             _controller = controller;
@@ -31,6 +34,7 @@ namespace _Project.Src.Common.GameProcessing
             _cellGeneration = cellGeneration;
             _cameraMover = cameraMover;
             _settings = settings;
+            _towersModels = towersModels;
 
             counter.currentTurn
                 .Where(x => x % 10 == 0)
@@ -42,8 +46,22 @@ namespace _Project.Src.Common.GameProcessing
         {
             _storage.SetPlayerControl(false);
             var findHexAtDistanceFromConnected = _controller.FindRandomHexAtDistanceFromConnected(5);
-            Vector3 worldPos = _controller.HexToWorld(findHexAtDistanceFromConnected);
-            _controller.SetTile(findHexAtDistanceFromConnected, _cellGeneration.GetFullGrass(), increment: false);
+            var worldPos = _controller.HexToWorld(findHexAtDistanceFromConnected);
+
+            var tower = new Tower()
+            {
+                hex = findHexAtDistanceFromConnected,
+                wordPos = worldPos,
+            };
+
+
+            _controller.SetTile(
+                findHexAtDistanceFromConnected,
+                _cellGeneration.GetFullGrass(),
+                incrementTurn: false
+            );
+
+            _towersModels.Add(tower);
 
             _cameraMover.FocusOn(
                 worldPosition: worldPos,
