@@ -57,6 +57,8 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 
             _isHexOnAvailable = new ReactiveProperty<bool>(false);
             _isHexOnAvailable.AddTo(this);
+
+            currentHexRotation.Subscribe(x => { UnityEngine.Debug.LogWarning($"new Rotation - {x} "); }).AddTo(this);
         }
 
         public void RotateHexCounterclockwise()

@@ -18,13 +18,7 @@ namespace _Project.Src.Common.CellDatas.Settings
 
         public GameObject GetPartBy(SideType type)
         {
-            var foo = tilePartPrefabs[type];
-
-            Debug.LogWarning($"foo is not null - {foo},");
-
-            return foo;
-            
-            throw new KeyNotFoundException($"Gameobject for SideType '{type}' not found in CellSettings.");
+            return tilePartPrefabs[type];
         }
     }
 }

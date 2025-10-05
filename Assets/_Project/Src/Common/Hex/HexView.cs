@@ -14,17 +14,11 @@ namespace _Project.Src.Common.Hex
             _controller = controller;
             _controller.BindView(this);
 
-            // Подписка на tile0
             _controller.tile0.Subscribe(x => SetGameObject(0, x)).AddTo(this);
-            // Подписка на tile1
             _controller.tile1.Subscribe(x => SetGameObject(1, x)).AddTo(this);
-            // Подписка на tile2
             _controller.tile2.Subscribe(x => SetGameObject(2, x)).AddTo(this);
-            // Подписка на tile3
             _controller.tile3.Subscribe(x => SetGameObject(3, x)).AddTo(this);
-            // Подписка на tile4
             _controller.tile4.Subscribe(x => SetGameObject(4, x)).AddTo(this);
-            // Подписка на tile5
             _controller.tile5.Subscribe(x => SetGameObject(5, x)).AddTo(this);
         }
 
@@ -47,18 +41,15 @@ namespace _Project.Src.Common.Hex
                 return;
             }
 
-            // Очищаем существующие объекты в anchor (если есть)
             foreach (Transform child in anchor)
             {
                 Destroy(child.gameObject);
             }
 
-            // Если prefab не null, инстанциируем новый объект
             if (prefab)
             {
                 var instantiated = Instantiate(prefab, anchor);
-                instantiated.transform.localPosition = Vector3.zero; // Устанавливаем локальную позицию
-                Debug.Log($"Instantiated object for tile{index} at anchor{index}");
+                instantiated.transform.localPosition = Vector3.zero;
             }
         }
 

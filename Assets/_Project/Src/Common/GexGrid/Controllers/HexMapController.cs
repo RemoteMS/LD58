@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using _Project.Src.Common.CellDatas;
 using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.GameProcessing;
 using _Project.Src.Common.Hex;
@@ -287,6 +286,61 @@ namespace _Project.Src.Common.GexGrid.Controllers
         public CellModel GetTile(Hex hex)
         {
             return _map.GetTile(hex);
+        }
+
+        public bool CanPlaceTile(Hex hex, CellModel newTile, int rotation)
+        {
+            var clone = newTile.Clone();
+            clone.SetRotation(rotation);
+
+            var occupiedNeighbors = new List<Hex>();
+            for (var i = 0; i < 6; i++)
+            {
+                var neighbor = hex.Neighbor(i);
+                if (_map.HasTile(neighbor))
+                {
+                    occupiedNeighbors.Add(neighbor);
+                }
+            }
+
+            if (occupiedNeighbors.Count == 0)
+            {
+                return true;
+            }
+
+            foreach (var neighborHex in occupiedNeighbors)
+            {
+                var neighborTile = GetTile(neighborHex);
+                if (neighborTile == null) continue;
+
+                var newTileSideIndex = GetSideIndexForNeighbor(hex, neighborHex);
+                var newTileSide = clone.GetSideData(newTileSideIndex);
+
+                var neighborSideIndex = GetSideIndexForNeighbor(neighborHex, hex);
+                var neighborSide = neighborTile.GetSideData(neighborSideIndex);
+
+                if (newTileSide.Type != neighborSide.Type)
+                {
+                    Debug.LogWarning(
+                        $"Cannot place tile at {hex.qrs}: Side mismatch with neighbor {neighborHex.qrs} ({newTileSide.Type} != {neighborSide.Type})");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private int GetSideIndexForNeighbor(Hex from, Hex to)
+        {
+            for (var i = 0; i < 6; i++)
+            {
+                if (from.Neighbor(i).Equals(to))
+                {
+                    return i;
+                }
+            }
+
+            throw new System.ArgumentException($"Hex {to.qrs} is not a neighbor of {from.qrs}");
         }
     }
 }

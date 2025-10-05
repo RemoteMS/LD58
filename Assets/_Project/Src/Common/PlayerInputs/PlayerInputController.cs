@@ -19,7 +19,10 @@ namespace _Project.Src.Common.PlayerInputs
         private readonly HexSetting _settings;
         private readonly Hand _hand;
 
-        public PlayerInputController(HexMapController controller, PlayerInputStorage storage, CameraMover cameraMover,
+        public PlayerInputController(
+            HexMapController controller,
+            PlayerInputStorage storage,
+            CameraMover cameraMover,
             HexSetting settings,
             Hand hand)
         {
@@ -122,9 +125,10 @@ namespace _Project.Src.Common.PlayerInputs
             _cameraMover.SetZoom(zoomInput);
         }
 
+
         private void HandleHexPlacing()
         {
-            // пкм
+            // ПКМ
             if (Input.GetMouseButtonDown(1))
             {
                 if (TryGetWorldPoint(out var worldPoint))
@@ -135,15 +139,29 @@ namespace _Project.Src.Common.PlayerInputs
 
                     if (!_storage.isHexOnAvailable.Value)
                     {
+                        Debug.LogWarning("Cannot place tile: Hex is not available.");
                         return;
                     }
 
                     if (_hand.count.Value > 0)
                     {
-                        _controller.SetTile(
-                            hex,
-                            _hand.TakeHexFromHandAndReduceCount()
-                        );
+                        CellModel currentModel = _storage.currentCellModelInHand.Value;
+                        int rotation = _storage.currentHexRotation.Value;
+
+                        // Проверяем, можно ли разместить тайл с текущим поворотом
+                        var cellModel = currentModel.Clone();
+                        if (_controller.CanPlaceTile(hex, cellModel, rotation))
+                        {
+                            currentModel.SetRotation(rotation);
+                            _controller.SetTile(
+                                hex,
+                                _hand.TakeHexFromHandAndReduceCount()
+                            );
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Cannot place tile: Side types do not match with neighbors.");
+                        }
                     }
                 }
             }
