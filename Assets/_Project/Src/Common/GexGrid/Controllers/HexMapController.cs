@@ -292,11 +292,9 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
         public (bool success, int neighborCount) CanPlaceTile(Hex hex, CellModel newTile, int rotation)
         {
-            // Клонируем модель, чтобы не изменять оригинал
             var clone = newTile.Clone();
             clone.SetRotation(rotation);
 
-            // Получаем занятых соседей
             var occupiedNeighbors = new List<Hex>();
             for (var i = 0; i < 6; i++)
             {

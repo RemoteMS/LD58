@@ -119,7 +119,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 6da43f2ff3cc44160b611d49f717785f, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 67886574d21f54ac3944c32721c8cde2, type: 2}
+      objectReference: {fileID: 2100000, guid: efccdcb5384d942a4beb6590f3d6b9fa, type: 2}
     - target: {fileID: 919132149155446097, guid: 6da43f2ff3cc44160b611d49f717785f, type: 3}
       propertyPath: m_Name
       value: hex_slice

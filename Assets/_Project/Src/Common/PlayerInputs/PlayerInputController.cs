@@ -1,3 +1,4 @@
+using _Project.Src.Common.Audio;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
@@ -141,6 +142,8 @@ namespace _Project.Src.Common.PlayerInputs
                                 _hand.TakeHexFromHandAndReduceCount()
                             );
 
+                            AudioManager.Instance.PlaySound(SoundType.TilePlace, 0.4f);
+
                             if (neighborCount > 1)
                             {
                                 _pointService.AddPoints(neighborCount * 10);
@@ -153,6 +156,7 @@ namespace _Project.Src.Common.PlayerInputs
                         }
                         else
                         {
+                            AudioManager.Instance.PlaySound(SoundType.OnErrorSetTile, 0.5f);
                             Debug.LogWarning(
                                 $"Cannot place tile: Side types do not match with {neighborCount} neighbors.");
                         }
