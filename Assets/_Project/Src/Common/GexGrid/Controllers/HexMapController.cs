@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using _Project.Src.Common.CellDatas;
 using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.GameProcessing;
-using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
@@ -63,6 +63,8 @@ namespace _Project.Src.Common.GexGrid.Controllers
             }).AddTo(this);
 
             _views[cell.hex] = view;
+
+            view.gameObject.name = $"{cell.hex.qrs}";
 
             cell.model.beforeDispose.Subscribe(_ =>
             {

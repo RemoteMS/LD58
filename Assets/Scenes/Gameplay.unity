@@ -254,13 +254,20 @@ MonoBehaviour:
     waitTime: 1
     easing: 25
   cellSettings:
-    materials:
-    - type: 1
-      material: {fileID: 2100000, guid: 234064adf93e742448a71d59ea9c3538, type: 2}
-    - type: 2
-      material: {fileID: 2100000, guid: bd2cd06fc91ba48ca9f2bbe4886cdfde, type: 2}
-    - type: 0
-      material: {fileID: 2100000, guid: 8cc1e33447f784d419250ebfc8c060d7, type: 2}
+    tilePartPrefabs:
+      _serializedList:
+      - Key: 0
+        Value: {fileID: 9008157319042662176, guid: 360ceefc303ad411eab39763cf309b8c, type: 3}
+      - Key: 1
+        Value: {fileID: 7083598344147594267, guid: 5524ebfbffc7c42f7aa83844f955348e, type: 3}
+      - Key: 2
+        Value: {fileID: 6524282194142124265, guid: bff146da2fae54286bc0182e507d8776, type: 3}
+      - Key: 3
+        Value: {fileID: 9216798891550128474, guid: d68de47c8998945098a1b651976c684f, type: 3}
+      - Key: 4
+        Value: {fileID: 609904542098470843, guid: d353326428b60482a87e2069ab55b6bb, type: 3}
+      - Key: 5
+        Value: {fileID: 8251660657380176132, guid: a3d54a3e6bd64458b8560a148b2defab, type: 3}
   handSettings:
     initialCount: 30
   towerSpawnerSettings:

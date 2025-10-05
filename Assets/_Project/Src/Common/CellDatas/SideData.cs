@@ -13,7 +13,7 @@ namespace _Project.Src.Common.CellDatas
             set => type = value;
         }
 
-        public SideData(SideType type = SideType.Default)
+        public SideData(SideType type = SideType.Def)
         {
             this.type = type;
         }

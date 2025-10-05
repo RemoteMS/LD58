@@ -4,27 +4,27 @@ using UnityEngine;
 namespace _Project.Src.Common.CellDatas.Settings
 {
     [System.Serializable]
-    public struct SideMaterialPair
+    public struct SidePair
     {
         public SideType type;
-        public Material material;
+        public GameObject tilePartPrefab;
     }
 
     [System.Serializable]
     public class CellSettings
     {
-        // todo: change on dictionary
-        [SerializeField] private List<SideMaterialPair> materials = new();
+        public AYellowpaper.SerializedCollections.SerializedDictionary<SideType, GameObject> tilePartPrefabs;
 
-        public Material GetMaterialBy(SideType type)
+
+        public GameObject GetPartBy(SideType type)
         {
-            foreach (var pair in materials)
-            {
-                if (pair.type == type)
-                    return pair.material;
-            }
+            var foo = tilePartPrefabs[type];
 
-            throw new KeyNotFoundException($"Material for SideType '{type}' not found in CellSettings.");
+            Debug.LogWarning($"foo is not null - {foo},");
+
+            return foo;
+            
+            throw new KeyNotFoundException($"Gameobject for SideType '{type}' not found in CellSettings.");
         }
     }
 }

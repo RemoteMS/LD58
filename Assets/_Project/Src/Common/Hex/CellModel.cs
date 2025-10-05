@@ -1,7 +1,6 @@
 using System;
 using _Project.Src.Common.CellDatas;
 using UniRx;
-using UnityEngine;
 
 namespace _Project.Src.Common.Hex
 {
@@ -9,9 +8,6 @@ namespace _Project.Src.Common.Hex
     {
         public IObservable<Unit> beforeDispose => _beforeDispose;
         private readonly Subject<Unit> _beforeDispose = new();
-
-        public IReadOnlyReactiveProperty<Color> color => _color;
-        private readonly ReactiveProperty<Color> _color = new(Color.white);
 
         public IReadOnlyReactiveProperty<bool> isConnectedToCenter => _isConnectedToCenter;
         private readonly ReactiveProperty<bool> _isConnectedToCenter = new(false);
@@ -46,10 +42,6 @@ namespace _Project.Src.Common.Hex
             _rotation = new ReactiveProperty<int>(rotation);
         }
 
-        public void SetColor(Color color)
-        {
-            _color.Value = color;
-        }
 
         public void SetConnectedToCenter(bool isConnected)
         {
@@ -124,7 +116,7 @@ namespace _Project.Src.Common.Hex
         {
             _beforeDispose.OnNext(Unit.Default);
             _beforeDispose.Dispose();
-            _color.Dispose();
+
             _isConnectedToCenter.Dispose();
             _rotation.Dispose();
         }

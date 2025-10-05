@@ -1,7 +1,6 @@
 using _Project.Src.Common.Engine;
 using _Project.Src.Common.GameProcessing.Settings;
 using _Project.Src.Common.Towers;
-using _Project.Src.Common.Towers.Settings;
 using _Project.Src.Core.DI.Classes;
 using UnityEngine;
 

@@ -129,35 +129,35 @@ namespace _Project.Src.Common.PlayerInputs.Views
 
         private readonly CompositeDisposable _disposables = new();
 
-        public IReadOnlyReactiveProperty<Material> material1 => _material1;
-        private readonly ReactiveProperty<Material> _material1;
+        public IReadOnlyReactiveProperty<GameObject> material1 => _material1;
+        private readonly ReactiveProperty<GameObject> _material1;
 
-        public IReadOnlyReactiveProperty<Material> material2 => _material2;
-        private readonly ReactiveProperty<Material> _material2;
+        public IReadOnlyReactiveProperty<GameObject> material2 => _material2;
+        private readonly ReactiveProperty<GameObject> _material2;
 
-        public IReadOnlyReactiveProperty<Material> material3 => _material3;
-        private readonly ReactiveProperty<Material> _material3;
+        public IReadOnlyReactiveProperty<GameObject> material3 => _material3;
+        private readonly ReactiveProperty<GameObject> _material3;
 
-        public IReadOnlyReactiveProperty<Material> material4 => _material4;
-        private readonly ReactiveProperty<Material> _material4;
+        public IReadOnlyReactiveProperty<GameObject> material4 => _material4;
+        private readonly ReactiveProperty<GameObject> _material4;
 
-        public IReadOnlyReactiveProperty<Material> material5 => _material5;
-        private readonly ReactiveProperty<Material> _material5;
+        public IReadOnlyReactiveProperty<GameObject> material5 => _material5;
+        private readonly ReactiveProperty<GameObject> _material5;
 
-        public IReadOnlyReactiveProperty<Material> material6 => _material6;
-        private readonly ReactiveProperty<Material> _material6;
+        public IReadOnlyReactiveProperty<GameObject> material6 => _material6;
+        private readonly ReactiveProperty<GameObject> _material6;
 
         public PointerBinder(CellSettings cellSettings, GameObject pointer)
         {
             _cellSettings = cellSettings;
             _pointer = pointer;
 
-            _material1 = new ReactiveProperty<Material>().AddTo(_disposables);
-            _material2 = new ReactiveProperty<Material>().AddTo(_disposables);
-            _material3 = new ReactiveProperty<Material>().AddTo(_disposables);
-            _material4 = new ReactiveProperty<Material>().AddTo(_disposables);
-            _material5 = new ReactiveProperty<Material>().AddTo(_disposables);
-            _material6 = new ReactiveProperty<Material>().AddTo(_disposables);
+            _material1 = new ReactiveProperty<GameObject>().AddTo(_disposables);
+            _material2 = new ReactiveProperty<GameObject>().AddTo(_disposables);
+            _material3 = new ReactiveProperty<GameObject>().AddTo(_disposables);
+            _material4 = new ReactiveProperty<GameObject>().AddTo(_disposables);
+            _material5 = new ReactiveProperty<GameObject>().AddTo(_disposables);
+            _material6 = new ReactiveProperty<GameObject>().AddTo(_disposables);
 
             if (_pointer.TryGetComponent<Pointer>(out var pointerPointer))
             {
@@ -167,12 +167,12 @@ namespace _Project.Src.Common.PlayerInputs.Views
 
         public void Bind(CellModel model)
         {
-            _material1.Value = _cellSettings.GetMaterialBy(model._sides[0].Type);
-            _material2.Value = _cellSettings.GetMaterialBy(model._sides[1].Type);
-            _material3.Value = _cellSettings.GetMaterialBy(model._sides[2].Type);
-            _material4.Value = _cellSettings.GetMaterialBy(model._sides[3].Type);
-            _material5.Value = _cellSettings.GetMaterialBy(model._sides[4].Type);
-            _material6.Value = _cellSettings.GetMaterialBy(model._sides[5].Type);
+            _material1.Value = _cellSettings.GetPartBy(model._sides[0].Type);
+            _material2.Value = _cellSettings.GetPartBy(model._sides[1].Type);
+            _material3.Value = _cellSettings.GetPartBy(model._sides[2].Type);
+            _material4.Value = _cellSettings.GetPartBy(model._sides[3].Type);
+            _material5.Value = _cellSettings.GetPartBy(model._sides[4].Type);
+            _material6.Value = _cellSettings.GetPartBy(model._sides[5].Type);
         }
 
         public void Unbind()
