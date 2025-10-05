@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.GameProcessing;
 using _Project.Src.Common.HandStack;
 using _Project.Src.Common.Hex;
 using _Project.Src.Common.HexSettings;
@@ -19,6 +20,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
         private readonly PlayerInputStorage _playerInputStorage;
         private readonly Hand _hand;
         private readonly HexMap _map;
+        private readonly GameTurnCounter _turnCounter;
         private readonly Dictionary<Hex, HexView> _views = new();
 
         public HexMapController(
@@ -26,7 +28,9 @@ namespace _Project.Src.Common.GexGrid.Controllers
             CellSettings cellSettings,
             PlayerInputStorage playerInputStorage,
             Hand hand,
-            HexMap map)
+            HexMap map,
+            GameTurnCounter turnCounter
+        )
         {
             _settings = settings;
             _cellSettings = cellSettings;
@@ -34,6 +38,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             _hand = hand;
 
             _map = map;
+            _turnCounter = turnCounter;
             _map.onCellAdded.Subscribe(OnCellAdded).AddTo(this);
 
             SetTile(new Hex(0, 0, 0), new CellModel());
@@ -94,8 +99,12 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
             _map.SetTile(hex, cellModel);
 
-            // var takeHexFromHand = _hand.TakeHexFromHandAndReduceCount();
-            // _playerInputStorage.SetCurrentCellModel(takeHexFromHand);
+            IncrementViewsTurnCount();
+        }
+
+        private void IncrementViewsTurnCount()
+        {
+            _turnCounter.Increase();
         }
 
         public void RemoveTile(Hex hex)
@@ -119,7 +128,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
             var cell = _map.GetTile(hex);
             return cell != null && cell.isConnectedToCenter.Value;
         }
-        
+
         public bool IsHexOnAvailable(Hex hex)
         {
             return _map.IsHexOnAvailable(hex);
@@ -246,7 +255,8 @@ namespace _Project.Src.Common.GexGrid.Controllers
                 }
             }
 
-            Debug.Log($"Available neighbors for hex {hex.qrs}: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
+            Debug.Log(
+                $"Available neighbors for hex {hex.qrs}: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors;
         }
 
@@ -274,7 +284,8 @@ namespace _Project.Src.Common.GexGrid.Controllers
         public List<Hex> GetAllAvailableNeighborsConnectedToCenter()
         {
             var availableNeighbors = _map.GetAllAvailableNeighborsConnectedToCenter();
-            Debug.Log($"Available neighbors connected to center: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
+            Debug.Log(
+                $"Available neighbors connected to center: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors.ToList();
         }
     }

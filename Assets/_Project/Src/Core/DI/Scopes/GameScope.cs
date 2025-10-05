@@ -1,4 +1,5 @@
 using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.GameProcessing;
 using _Project.Src.Common.GexGrid;
 using _Project.Src.Common.GexGrid.Controllers;
 using _Project.Src.Common.HandStack;
@@ -47,6 +48,9 @@ namespace _Project.Src.Core.DI.Scopes
             builder.Register<PlayerInputStorage>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<PlayerView>(lifetime: Lifetime.Singleton).AsSelf();
 
+            builder.Register<GameTurnCounter>(lifetime: Lifetime.Singleton).AsSelf();
+            builder.Register<TurnActionService>(lifetime: Lifetime.Singleton).AsSelf();
+
             builder.RegisterBuildCallback(c =>
             {
                 c.Resolve<HexMapController>();
@@ -54,6 +58,8 @@ namespace _Project.Src.Core.DI.Scopes
                 c.Resolve<HexMapDrawer>();
                 c.Resolve<PlayerView>();
                 c.Resolve<Hand>();
+
+                c.Resolve<GameTurnCounter>();
             });
         }
     }
