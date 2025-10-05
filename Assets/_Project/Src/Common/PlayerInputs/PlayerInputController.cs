@@ -156,7 +156,7 @@ namespace _Project.Src.Common.PlayerInputs
                         }
                         else
                         {
-                            AudioManager.Instance.PlaySound(SoundType.OnErrorSetTile, 0.5f);
+                            AudioManager.Instance.PlaySound(SoundType.OnErrorSetTile, 0.3f);
                             Debug.LogWarning(
                                 $"Cannot place tile: Side types do not match with {neighborCount} neighbors.");
                         }

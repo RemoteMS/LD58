@@ -17,11 +17,9 @@ MonoBehaviour:
     - Key: 1
       Value:
         clips:
-        - {fileID: 8300000, guid: a750a33ed801d42d1aca9199df177561, type: 3}
         - {fileID: 8300000, guid: 28887199db2b348a3979edcaa4867537, type: 3}
         - {fileID: 8300000, guid: 768525f6cfea446aab6f7c0691d4932a, type: 3}
         - {fileID: 8300000, guid: ba4e23352d51b491f8fd33629bf9762e, type: 3}
-        - {fileID: 8300000, guid: c33920943adaa437ab154ec18d6cca78, type: 3}
         preventRepeat: 1
         lastPlayedIndex: 0
     - Key: 4
