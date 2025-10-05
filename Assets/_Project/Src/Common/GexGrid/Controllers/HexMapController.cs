@@ -18,7 +18,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
         private readonly HexSetting _settings;
         private readonly CellSettings _cellSettings;
         private readonly PlayerInputStorage _playerInputStorage;
-        private readonly Hand _hand;
         private readonly HexMap _map;
         private readonly GameTurnCounter _turnCounter;
         private readonly Dictionary<Hex, HexView> _views = new();
@@ -27,7 +26,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
             HexSetting settings,
             CellSettings cellSettings,
             PlayerInputStorage playerInputStorage,
-            Hand hand,
             HexMap map,
             GameTurnCounter turnCounter
         )
@@ -35,7 +33,6 @@ namespace _Project.Src.Common.GexGrid.Controllers
             _settings = settings;
             _cellSettings = cellSettings;
             _playerInputStorage = playerInputStorage;
-            _hand = hand;
 
             _map = map;
             _turnCounter = turnCounter;
@@ -287,6 +284,11 @@ namespace _Project.Src.Common.GexGrid.Controllers
             Debug.Log(
                 $"Available neighbors connected to center: {string.Join(", ", availableNeighbors.Select(n => n.qrs))}");
             return availableNeighbors.ToList();
+        }
+
+        public CellModel GetTile(Hex hex)
+        {
+            return _map.GetTile(hex);
         }
     }
 }

@@ -12,15 +12,18 @@ namespace _Project.Src.Common.HandStack
     public class Hand : BaseService
     {
         private readonly PlayerInputStorage _storage;
+        private readonly CellGenerationService _cellGeneration;
         public IReadOnlyReactiveProperty<int> count => _count;
         private readonly ReactiveProperty<int> _count;
 
         public IReadOnlyReactiveProperty<CellModel> firstInQueue => _firstInQueue;
         private ReactiveProperty<CellModel> _firstInQueue = new(null);
 
-        public Hand(HandSettings settings, PlayerInputStorage storage)
+        public Hand(HandSettings settings, PlayerInputStorage storage, CellGenerationService cellGeneration)
         {
             _storage = storage;
+            _cellGeneration = cellGeneration;
+
             _count = new ReactiveProperty<int>(settings.initialCount);
 
             storage.SetCurrentCellModel(GetRandomCellModel());
@@ -43,7 +46,7 @@ namespace _Project.Src.Common.HandStack
 
             if (count.Value > 3)
             {
-                _storage.SetThirdCellModel(GetRandomCellModel());
+                _storage.SetThirdCellModel(GetBest());
             }
             else
             {
@@ -51,6 +54,12 @@ namespace _Project.Src.Common.HandStack
             }
 
             return value;
+        }
+
+        private CellModel GetBest()
+        {
+            // return GetRandomCellModel();
+            return _cellGeneration.GetRandomBestHexBasedNeighbors();
         }
 
         public CellModel GetRandomCellModel()

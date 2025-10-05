@@ -50,6 +50,8 @@ namespace _Project.Src.Core.DI.Scopes
 
             builder.Register<GameTurnCounter>(lifetime: Lifetime.Singleton).AsSelf();
             builder.Register<TurnActionService>(lifetime: Lifetime.Singleton).AsSelf();
+            
+            builder.Register<CellGenerationService>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.RegisterBuildCallback(c =>
             {
@@ -60,6 +62,7 @@ namespace _Project.Src.Core.DI.Scopes
                 c.Resolve<Hand>();
 
                 c.Resolve<GameTurnCounter>();
+                c.Resolve<CellGenerationService>();
             });
         }
     }
