@@ -32,6 +32,7 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public IReadOnlyReactiveProperty<int> currentHexRotation => _currentHexRotation;
         private readonly ReactiveProperty<int> _currentHexRotation;
 
+
         public PlayerInputStorage()
         {
             _playerHasControl = new ReactiveProperty<bool>(true);
@@ -104,6 +105,13 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public void SetPlayerControl(bool value)
         {
             _playerHasControl.Value = value;
+        }
+
+        public readonly Subject<Unit> gameOver = new();
+
+        public void SetGameOver()
+        {
+            gameOver.OnNext(Unit.Default);
         }
     }
 }

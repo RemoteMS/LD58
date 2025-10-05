@@ -144,11 +144,11 @@ namespace _Project.Src.Common.HandStack
         {
             _count.Value += amount;
 
-            // Если карт стало меньше 3, добавляем недостающие
-            while (_count.Value > 0 && GetCurrentHandSize() < 3 && GetCurrentHandSize() < _count.Value)
-            {
-                AddToHandEnd(GetBest());
-            }
+            // // Если карт стало меньше 3, добавляем недостающие
+            // while (_count.Value > 0 && GetCurrentHandSize() < 3 && GetCurrentHandSize() < _count.Value)
+            // {
+            //     AddToHandEnd(GetBest());
+            // }
         }
 
 // Вспомогательный метод для получения текущего количества карт в слотах руки

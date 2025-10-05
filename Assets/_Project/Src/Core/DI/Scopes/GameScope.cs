@@ -1,3 +1,4 @@
+using _Project.Src.Common;
 using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.GameProcessing;
 using _Project.Src.Common.GameProcessing.Settings;
@@ -66,6 +67,7 @@ namespace _Project.Src.Core.DI.Scopes
             builder.Register<CellGenerationService>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.Register<PointService>(lifetime: Lifetime.Singleton).AsSelf();
+            builder.Register<GameOverService>(lifetime: Lifetime.Singleton).AsSelf();
 
             builder.RegisterBuildCallback(c =>
             {
@@ -82,6 +84,7 @@ namespace _Project.Src.Core.DI.Scopes
                 c.Resolve<TowersControllers>();
                 c.Resolve<TowerViews>();
                 c.Resolve<PointService>();
+                c.Resolve<GameOverService>();
             });
         }
     }
