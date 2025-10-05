@@ -94,7 +94,7 @@ namespace _Project.Src.Common.GexGrid.Controllers
 
             _map.SetTile(hex, cellModel);
 
-            var takeHexFromHand = _hand.TakeHexFromHand();
+            var takeHexFromHand = _hand.TakeHexFromHandAndReduceCount();
             _playerInputStorage.SetCurrentCellModel(takeHexFromHand);
         }
 

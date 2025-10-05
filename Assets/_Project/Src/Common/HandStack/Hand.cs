@@ -38,7 +38,7 @@ namespace _Project.Src.Common.HandStack
 
         private SideType GetRandomSideType()
         {
-            SideType[] sideTypes = (SideType[])Enum.GetValues(typeof(SideType));
+            var sideTypes = (SideType[])Enum.GetValues(typeof(SideType));
             return sideTypes[random.Next(0, sideTypes.Length)];
         }
 
