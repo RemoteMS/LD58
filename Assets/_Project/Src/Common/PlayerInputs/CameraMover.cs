@@ -4,6 +4,7 @@ using LitMotion;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using _Project.Src.Common.PlayerInputs.Storages;
 using UnityEngine;
 
 namespace _Project.Src.Common.PlayerInputs
@@ -11,13 +12,15 @@ namespace _Project.Src.Common.PlayerInputs
     public class CameraMover : BaseService
     {
         private readonly CameraSettings _settings;
+        private readonly PlayerInputStorage _storage;
         private readonly Transform _cameraContainer;
 
         private CancellationTokenSource _focusCts;
 
-        public CameraMover(CameraSettings settings)
+        public CameraMover(CameraSettings settings, PlayerInputStorage storage)
         {
             _settings = settings;
+            _storage = storage;
             _cameraContainer = settings.cameraContainer;
         }
 
@@ -134,6 +137,8 @@ namespace _Project.Src.Common.PlayerInputs
             {
                 var rotateAmount = rotation * _settings.rotationSpeed * Time.deltaTime;
                 _cameraContainer.Rotate(Vector3.up, rotateAmount);
+
+                _storage.SetCameraRotation(_cameraContainer.rotation);
             }
         }
 

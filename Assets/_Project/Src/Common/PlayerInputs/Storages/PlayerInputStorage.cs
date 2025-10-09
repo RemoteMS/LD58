@@ -1,3 +1,4 @@
+using System;
 using _Project.Src.Common.Hex;
 using _Project.Src.Core.DI.Classes;
 using UniRx;
@@ -7,6 +8,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 {
     public class PlayerInputStorage : BaseService
     {
+        public IObservable<Unit> gameOver => _gameOver;
+        private readonly Subject<Unit> _gameOver = new();
+
         public IReadOnlyReactiveProperty<bool> playerHasControl => _playerHasControl;
         private readonly ReactiveProperty<bool> _playerHasControl;
 
@@ -32,6 +36,8 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public IReadOnlyReactiveProperty<int> currentHexRotation => _currentHexRotation;
         private readonly ReactiveProperty<int> _currentHexRotation;
 
+        public IReadOnlyReactiveProperty<Quaternion> currentCameraRotation => _currentCameraRotation;
+        private readonly ReactiveProperty<Quaternion> _currentCameraRotation;
 
         public PlayerInputStorage()
         {
@@ -58,6 +64,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
 
             _isHexOnAvailable = new ReactiveProperty<bool>(false);
             _isHexOnAvailable.AddTo(this);
+
+            _currentCameraRotation = new ReactiveProperty<Quaternion>(Quaternion.identity);
+            _currentCameraRotation.AddTo(this);
 
             currentHexRotation.Subscribe(x => { UnityEngine.Debug.LogWarning($"new Rotation - {x} "); }).AddTo(this);
         }
@@ -107,11 +116,14 @@ namespace _Project.Src.Common.PlayerInputs.Storages
             _playerHasControl.Value = value;
         }
 
-        public readonly Subject<Unit> gameOver = new();
+        public void SetCameraRotation(Quaternion rotation)
+        {
+            _currentCameraRotation.Value = rotation;
+        }
 
         public void SetGameOver()
         {
-            gameOver.OnNext(Unit.Default);
+            _gameOver.OnNext(Unit.Default);
         }
     }
 }

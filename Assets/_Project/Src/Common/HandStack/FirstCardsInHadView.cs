@@ -61,6 +61,13 @@ namespace _Project.Src.Common.HandStack
                 cardView.gameObject.transform.localPosition = elementView._cardTargetTransform.localPosition;
             }
 
+            public void Rotate(Quaternion rotation)
+            {
+                // pre rotation
+                // cardView.gameObject.transform.localRotation = rotation;
+                // cardView.gameObject.transform.localRotation rotation = rotation;
+            }
+
             public void Dispose()
             {
                 _cardController?.Dispose();
@@ -83,6 +90,10 @@ namespace _Project.Src.Common.HandStack
         public void Inject(PlayerInputStorage storage, CellSettings settings)
         {
             InitializePositions();
+
+            storage.currentCameraRotation
+                .Subscribe(x => { firstEl.Rotate(x); })
+                .AddTo(_disposables);
 
             storage.currentCellModelInHand
                 .Subscribe(cellModel => { firstEl.InitController(cellModel, settings); })
