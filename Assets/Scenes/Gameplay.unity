@@ -456,7 +456,7 @@ MonoBehaviour:
       - Key: 5
         Value: {fileID: 8251660657380176132, guid: a3d54a3e6bd64458b8560a148b2defab, type: 3}
   handSettings:
-    initialCount: 35
+    initialCount: 10
   towerSpawnerSettings:
     towers:
     - wordPos: {x: 0, y: 0, z: 0}
@@ -1821,11 +1821,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6f718e190a84dc68003c5d6cc3c085c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstCardView: {fileID: 1780112809}
-  secondCardView: {fileID: 678936059}
-  thirdCardView: {fileID: 1597471427}
-  heightOffset: 1
   moveHexes: 1
+  firstEl:
+    cardView: {fileID: 1780112809}
+  secondEl:
+    cardView: {fileID: 678936059}
+  thirdEl:
+    cardView: {fileID: 1597471427}
+  heightOffset: 1
+  timeDuration: 0.3
 --- !u!1001 &1361487871
 PrefabInstance:
   m_ObjectHideFlags: 0
