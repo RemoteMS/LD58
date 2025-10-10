@@ -6,7 +6,6 @@ using _Project.Src.Common.PlayerInputs.Storages;
 using LitMotion;
 using LitMotion.Extensions;
 using UniRx;
-using UnityEditor;
 using UnityEngine;
 using VContainer;
 
@@ -72,11 +71,7 @@ namespace _Project.Src.Common.HandStack
 
             public void SetCardRotatorRotation(Quaternion rotation)
             {
-                var eulerAngles = rotation.eulerAngles;
-                eulerAngles.y = -eulerAngles.y;
-                var newRotation = Quaternion.Euler(eulerAngles);
-
-                cardCameraRotateContainer.localRotation = newRotation;
+                cardCameraRotateContainer.localRotation = rotation;
             }
 
             public void Dispose()
@@ -146,7 +141,7 @@ namespace _Project.Src.Common.HandStack
 
             // Q/E Camera rotation
 
-            storage.currentCameraRotation
+            storage.invertedCameraRotation
                 .Subscribe(quaternion => { RotateHand(quaternion, firstEl, secondEl, thirdEl); })
                 .AddTo(_disposables);
         }

@@ -138,8 +138,16 @@ namespace _Project.Src.Common.PlayerInputs
                 var rotateAmount = rotation * _settings.rotationSpeed * Time.deltaTime;
                 _cameraContainer.Rotate(Vector3.up, rotateAmount);
 
-                _storage.SetCameraRotation(_cameraContainer.rotation);
+                var inverted = InvertCameraRotationByY(_cameraContainer.rotation);
+                _storage.SetInvertedCameraRotation(inverted);
             }
+        }
+
+        private Quaternion InvertCameraRotationByY(Quaternion rotation)
+        {
+            var eulerAngles = rotation.eulerAngles;
+            eulerAngles.y = -eulerAngles.y;
+            return Quaternion.Euler(eulerAngles);
         }
 
         public void SetZoom(float zoom)

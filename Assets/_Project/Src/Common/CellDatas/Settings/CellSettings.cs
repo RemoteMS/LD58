@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace _Project.Src.Common.CellDatas.Settings

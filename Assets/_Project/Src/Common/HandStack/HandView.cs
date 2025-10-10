@@ -1,6 +1,10 @@
 using UnityEngine;
 using VContainer;
 using System.Collections.Generic;
+using _Project.Src.Common.CellDatas.Settings;
+using _Project.Src.Common.HexSettings;
+using _Project.Src.Common.PlayerInputs.Storages;
+using LitMotion;
 using UniRx;
 
 namespace _Project.Src.Common.HandStack
@@ -12,18 +16,71 @@ namespace _Project.Src.Common.HandStack
         [SerializeField] private float randomRotationMax = 30f;
         [SerializeField] private int maxVisibleTiles = 100;
 
-        private readonly List<GameObject> _tilePool = new();
-        private readonly Stack<GameObject> _activeTiles = new();
+        private Quaternion _rotation;
+        private float _settingHexRotationSpeed;
+
+        private readonly List<IStackHex> _tilePool = new();
+        private readonly Stack<IStackHex> _activeTiles = new();
         private Hand _hand;
         private Transform _tilesParent;
         private readonly CompositeDisposable _disposables = new();
 
         [Inject]
-        public void Inject(Hand hand)
+        public void Inject(Hand hand, CellSettings cellSettings, HexSetting hexSetting, PlayerInputStorage storage)
         {
+            _rotation = Quaternion.identity;
+            _settingHexRotationSpeed = hexSetting.hexRotationSpeed;
+
             _hand = hand;
-            Debug.LogWarning("Hand injected");
             Initialize();
+
+            storage.invertedCameraRotation.Subscribe(SetRotation).AddTo(_disposables);
+
+            storage.currentHexRotation.Subscribe(RotateAllOnIndex).AddTo(_disposables);
+        }
+
+        private void RotateAllOnIndex(int index)
+        {
+            foreach (var tile in _tilePool)
+            {
+                RotateOnIndex(index, tile);
+            }
+        }
+
+        private void RotateOnIndex(int index, IStackHex hex)
+        {
+            if (index < 0 || index > 5)
+            {
+                Debug.LogError($"Invalid rotation index: {index}. Must be between 0 and 5.");
+                return;
+            }
+
+            if (hex.HexAnimationRotationIsActive())
+            {
+                hex.CancelHexAnimationRotation();
+            }
+
+            var targetAngle = index * 60f;
+            var targetRotation = Quaternion.Euler(0, targetAngle, 0);
+
+            var motionHandle = LMotion.Create(_rotation, targetRotation, _settingHexRotationSpeed)
+                .WithEase(Ease.InOutQuad)
+                .Bind(x =>
+                {
+                    _rotation = x;
+                    if (hex.tileRenderer)
+                        hex.tileRenderer.transform.rotation = _rotation;
+                });
+
+            hex.SetMotionHandle(ref
+                motionHandle
+            );
+        }
+
+        private void SetRotation(Quaternion quaternion)
+        {
+            foreach (var tile in _tilePool)
+                tile.SetCamaraRotatorRotation(quaternion);
         }
 
         private void Initialize()
@@ -47,28 +104,27 @@ namespace _Project.Src.Common.HandStack
             {
                 var tile = CreateTile(i);
                 _tilePool.Add(tile);
-                tile.SetActive(false);
+                tile.Deactivate();
             }
 
             UpdateStack(count);
         }
 
-        private GameObject CreateTile(int index)
+        private StackHex CreateTile(int index)
         {
             var localPosition = Vector3.down * (index * heightOffset);
             var worldPosition = _tilesParent.TransformPoint(localPosition);
             var tile = Instantiate(hexPrefab, worldPosition, Quaternion.identity, _tilesParent);
 
-            // var randomRot = Random.Range(-randomRotationMax, randomRotationMax);
-            // tile.transform.Rotate(Vector3.up, randomRot);
+            tile.name = $"Tile_{index}";
 
-            return tile;
+            var stackHex = tile.GetComponent<StackHex>();
+
+            return stackHex;
         }
 
         private void UpdateStack(int newCount)
         {
-            // update count 
-            // removing first 3 elements because of views  
             newCount -= 3;
 
             var visibleTiles = Mathf.Min(newCount, maxVisibleTiles);
@@ -79,7 +135,7 @@ namespace _Project.Src.Common.HandStack
                 if (_activeTiles.Count > 0)
                 {
                     var tile = _activeTiles.Pop();
-                    tile.SetActive(false);
+                    tile.Deactivate();
                 }
 
                 currentActiveCount--;
@@ -88,8 +144,8 @@ namespace _Project.Src.Common.HandStack
             while (currentActiveCount < visibleTiles && _tilePool.Count > currentActiveCount)
             {
                 var tile = _tilePool[currentActiveCount];
-                tile.transform.localPosition = Vector3.down * (currentActiveCount * heightOffset);
-                tile.SetActive(true);
+                tile.SetContainerLocalPosition(Vector3.down * (currentActiveCount * heightOffset));
+                tile.Activate();
                 _activeTiles.Push(tile);
                 currentActiveCount++;
             }
@@ -98,7 +154,7 @@ namespace _Project.Src.Common.HandStack
             {
                 var tile = CreateTile(currentActiveCount);
                 _tilePool.Add(tile);
-                tile.SetActive(true);
+                tile.Deactivate();
                 _activeTiles.Push(tile);
                 currentActiveCount++;
             }
@@ -108,7 +164,7 @@ namespace _Project.Src.Common.HandStack
         {
             foreach (var tile in _tilePool)
             {
-                Destroy(tile);
+                Destroy(tile.gameObject);
             }
 
             _tilePool.Clear();

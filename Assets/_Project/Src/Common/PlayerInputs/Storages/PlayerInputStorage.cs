@@ -36,8 +36,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
         public IReadOnlyReactiveProperty<int> currentHexRotation => _currentHexRotation;
         private readonly ReactiveProperty<int> _currentHexRotation;
 
-        public IReadOnlyReactiveProperty<Quaternion> currentCameraRotation => _currentCameraRotation;
-        private readonly ReactiveProperty<Quaternion> _currentCameraRotation;
+        public IReadOnlyReactiveProperty<Quaternion> invertedCameraRotation => _invertedCameraRotation;
+        private readonly ReactiveProperty<Quaternion> _invertedCameraRotation;
+
 
         public PlayerInputStorage()
         {
@@ -65,8 +66,8 @@ namespace _Project.Src.Common.PlayerInputs.Storages
             _isHexOnAvailable = new ReactiveProperty<bool>(false);
             _isHexOnAvailable.AddTo(this);
 
-            _currentCameraRotation = new ReactiveProperty<Quaternion>(Quaternion.identity);
-            _currentCameraRotation.AddTo(this);
+            _invertedCameraRotation = new ReactiveProperty<Quaternion>(Quaternion.identity);
+            _invertedCameraRotation.AddTo(this);
 
             currentHexRotation.Subscribe(x => { UnityEngine.Debug.LogWarning($"new Rotation - {x} "); }).AddTo(this);
         }
@@ -116,9 +117,9 @@ namespace _Project.Src.Common.PlayerInputs.Storages
             _playerHasControl.Value = value;
         }
 
-        public void SetCameraRotation(Quaternion rotation)
+        public void SetInvertedCameraRotation(Quaternion rotation)
         {
-            _currentCameraRotation.Value = rotation;
+            _invertedCameraRotation.Value = rotation;
         }
 
         public void SetGameOver()
