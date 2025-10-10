@@ -3,7 +3,15 @@ using UnityEngine;
 
 namespace _Project.Src.Common.Hex
 {
-    public class HexView : MonoBehaviour
+    public interface IHexView
+    {
+        void Bind(CellController controller);
+
+        void EnableRendererContainer();
+        void DisableRendererContainer();
+    }
+
+    public class HexView : MonoBehaviour, IHexView
     {
         [SerializeField] private HexViewObjectsAnchors _anchors;
         [SerializeField] private GameObject _rendererContainer;
@@ -12,7 +20,6 @@ namespace _Project.Src.Common.Hex
         public void Bind(CellController controller)
         {
             _controller = controller;
-            _controller.BindView(this);
 
             _controller.tile0.Subscribe(x => SetGameObject(0, x)).AddTo(this);
             _controller.tile1.Subscribe(x => SetGameObject(1, x)).AddTo(this);

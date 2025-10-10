@@ -8,7 +8,6 @@ namespace _Project.Src.Common.Hex
     public class CellController : BaseService
     {
         private readonly CellModel _model;
-        private HexView _view;
 
         private readonly ReactiveProperty<GameObject> _tile0;
         private readonly ReactiveProperty<GameObject> _tile1;
@@ -36,12 +35,6 @@ namespace _Project.Src.Common.Hex
             _tile5 = new ReactiveProperty<GameObject>(cellSettings.GetPartBy(model._sides[5].Type));
 
             _model.beforeDispose.Subscribe().AddTo(this);
-        }
-
-
-        public void BindView(HexView view)
-        {
-            _view = view;
         }
     }
 }

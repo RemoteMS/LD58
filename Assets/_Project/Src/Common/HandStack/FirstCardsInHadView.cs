@@ -1,6 +1,7 @@
 using System;
 using _Project.Src.Common.CellDatas.Settings;
 using _Project.Src.Common.Hex;
+using _Project.Src.Common.HexSettings;
 using _Project.Src.Common.PlayerInputs.Storages;
 using LitMotion;
 using LitMotion.Extensions;
@@ -15,7 +16,13 @@ namespace _Project.Src.Common.HandStack
         [Serializable]
         public class ElementView : IDisposable
         {
-            public Transform viewTransform => cardView.gameObject.transform;
+            [field: SerializeField] public Transform cardContainer { get; private set; }
+            [SerializeField] private Transform cardCameraRotateContainer;
+
+            // public Transform viewTransform => cardView.gameObject.transform;
+            [SerializeField] public Transform cardTransform;
+
+            private IHexView _cardView => cardView;
             [SerializeField] private HexView cardView;
 
             private CellController _cardController;
@@ -30,7 +37,7 @@ namespace _Project.Src.Common.HandStack
                 pointTarget.transform.localPosition = Vector3.down * (index * heightOffset);
                 _cardTargetTransform = pointTarget.transform;
 
-                cardView.transform.localPosition = pointTarget.transform.localPosition;
+                cardContainer.localPosition = pointTarget.transform.localPosition;
             }
 
             public void InitController(CellModel cellModel, CellSettings settings)
@@ -40,14 +47,13 @@ namespace _Project.Src.Common.HandStack
 
                 if (cellModel != null)
                 {
-                    cardView.EnableRendererContainer();
+                    _cardView.EnableRendererContainer();
                     _cardController = new CellController(cellModel, settings);
-                    _cardController.BindView(cardView);
-                    cardView.Bind(_cardController);
+                    _cardView.Bind(_cardController);
                 }
                 else
                 {
-                    cardView.DisableRendererContainer();
+                    _cardView.DisableRendererContainer();
                 }
             }
 
@@ -58,19 +64,26 @@ namespace _Project.Src.Common.HandStack
 
             public void SetLocalPosition(ElementView elementView)
             {
-                cardView.gameObject.transform.localPosition = elementView._cardTargetTransform.localPosition;
+                cardContainer.gameObject.transform.localPosition = elementView._cardTargetTransform.localPosition;
             }
 
-            public void Rotate(Quaternion rotation)
+            public void SetRotation(Quaternion rotation)
             {
-                // pre rotation
-                // cardView.gameObject.transform.localRotation = rotation;
-                // cardView.gameObject.transform.localRotation rotation = rotation;
+                cardContainer.localRotation = rotation;
             }
 
             public void Dispose()
             {
                 _cardController?.Dispose();
+            }
+
+            public void SetCardRotatorRotation(Quaternion rotation)
+            {
+                var eulerAngles = rotation.eulerAngles;
+                eulerAngles.y = -eulerAngles.y;
+                var newRotation = Quaternion.Euler(eulerAngles);
+
+                cardCameraRotateContainer.localRotation = newRotation;
             }
         }
 
@@ -82,29 +95,34 @@ namespace _Project.Src.Common.HandStack
         [SerializeField] private ElementView thirdEl;
 
 
-        [SerializeField] private float heightOffset = 3f;
+        [Header("Cards Params")] [SerializeField]
+        private float heightOffset = 3f;
+
         private readonly CompositeDisposable _disposables = new();
 
 
+        private Quaternion _rotation;
+        private MotionHandle _rotationHandle;
+        private float _settingHexRotationSpeed;
+
         [Inject]
-        public void Inject(PlayerInputStorage storage, CellSettings settings)
+        public void Inject(PlayerInputStorage storage, CellSettings cellSettings, HexSetting hexSetting)
         {
             InitializePositions();
 
-            storage.currentCameraRotation
-                .Subscribe(x => { firstEl.Rotate(x); })
-                .AddTo(_disposables);
+            _settingHexRotationSpeed = hexSetting.hexRotationSpeed;
+            _rotation = Quaternion.identity;
 
             storage.currentCellModelInHand
-                .Subscribe(cellModel => { firstEl.InitController(cellModel, settings); })
+                .Subscribe(cellModel => { firstEl.InitController(cellModel, cellSettings); })
                 .AddTo(_disposables);
 
             storage.secondCellModelInHand
-                .Subscribe(cellModel => { secondEl.InitController(cellModel, settings); })
+                .Subscribe(cellModel => { secondEl.InitController(cellModel, cellSettings); })
                 .AddTo(_disposables);
 
             storage.thirdCellModelInHand
-                .Subscribe(cellModel => { thirdEl.InitController(cellModel, settings); })
+                .Subscribe(cellModel => { thirdEl.InitController(cellModel, cellSettings); })
                 .AddTo(_disposables);
 
 
@@ -113,10 +131,55 @@ namespace _Project.Src.Common.HandStack
             storage.currentCellModelInHand
                 .Subscribe(_ => HandleFirstCardEvent())
                 .AddTo(_disposables);
-
+            
             storage.secondCellModelInHand
                 .Subscribe(_ => HandleSecondCardEvent())
                 .AddTo(_disposables);
+
+            // R/T Card rotation
+
+            storage.currentHexRotation
+                .Subscribe(RotateOnIndex)
+                .AddTo(_disposables);
+
+            // Q/E Camera rotation
+
+            storage.currentCameraRotation
+                .Subscribe(RotateHand)
+                .AddTo(_disposables);
+        }
+
+
+        private void RotateHand(Quaternion rotation)
+        {
+            firstEl.SetCardRotatorRotation(rotation);
+        }
+
+        private void RotateOnIndex(int index)
+        {
+            if (index < 0 || index > 5)
+            {
+                Debug.LogError($"Invalid rotation index: {index}. Must be between 0 and 5.");
+                return;
+            }
+
+            if (_rotationHandle.IsActive())
+            {
+                _rotationHandle.Cancel();
+            }
+
+            var targetAngle = index * 60f;
+            var targetRotation = Quaternion.Euler(0, targetAngle, 0);
+
+
+            _rotationHandle = LMotion.Create(_rotation, targetRotation, _settingHexRotationSpeed)
+                .WithEase(Ease.InOutQuad)
+                .Bind(x =>
+                {
+                    _rotation = x;
+                    if (firstEl.cardTransform.gameObject)
+                        firstEl.cardTransform.rotation = _rotation;
+                });
         }
 
         private MotionHandle _currentAnimationHandle;
@@ -137,7 +200,7 @@ namespace _Project.Src.Common.HandStack
                 .Create(secondEl.cardTargetTransform.localPosition, firstEl.cardTargetTransform.localPosition,
                     timeDuration)
                 .WithEase(Ease.OutCubic)
-                .BindToLocalPosition(firstEl.viewTransform)
+                .BindToLocalPosition(firstEl.cardContainer)
                 .AddTo(this);
         }
 
@@ -155,7 +218,7 @@ namespace _Project.Src.Common.HandStack
                 .Create(thirdEl.cardTargetTransform.localPosition, secondEl.cardTargetTransform.localPosition,
                     timeDuration)
                 .WithEase(Ease.OutCubic)
-                .BindToLocalPosition(secondEl.viewTransform)
+                .BindToLocalPosition(secondEl.cardContainer)
                 .AddTo(this);
         }
 
