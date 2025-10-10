@@ -488,7 +488,7 @@ MonoBehaviour:
       - Key: 5
         Value: {fileID: 8251660657380176132, guid: a3d54a3e6bd64458b8560a148b2defab, type: 3}
   handSettings:
-    initialCount: 10
+    initialCount: 35
   towerSpawnerSettings:
     towers:
     - wordPos: {x: 0, y: 0, z: 0}
